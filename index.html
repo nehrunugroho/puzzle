@@ -64,6 +64,11 @@
         ::-webkit-scrollbar {
             display: none;
         }
+
+        .input-error {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center">
@@ -71,13 +76,7 @@
     <!-- CANVAS LAYAR PENUH -->
     <canvas id="game-canvas"></canvas>
 
-    <!-- PENGATURAN SUARA -->
-    <button id="sound-toggle" onclick="toggleSound()" class="fixed top-2 right-2 z-[30] bg-white p-2 rounded-full shadow-lg border-2 border-gray-100 hover:scale-110 transition-transform pointer-events-auto">
-        <span id="sound-icon" class="text-lg">🔊</span>
-    </button>
-
     <!-- HALAMAN UTAMA -->
-    <!-- h-screen dan rounded-none memastikan panel menempel dari atas ke bawah -->
     <div id="home-view" class="ui-overlay w-full max-w-sm ui-panel px-6 py-2 rounded-none shadow-none border-x-4 border-white fade-in flex flex-col h-screen justify-between">
         
         <div class="text-center pt-4">
@@ -87,15 +86,16 @@
 
         <div class="flex-1 flex flex-col justify-center space-y-3 overflow-hidden">
             <!-- Data Pemain -->
-            <div class="bg-yellow-50 p-3 rounded-2xl border-2 border-yellow-100 space-y-2">
+            <div id="form-container" class="bg-yellow-50 p-3 rounded-2xl border-2 border-yellow-100 space-y-2">
                 <div class="flex flex-col gap-0.5">
-                    <label class="text-[8px] font-black text-orange-400 uppercase tracking-tighter ml-1">Siapa Nama Kamu?</label>
-                    <input type="text" id="child-name" placeholder="Tulis di sini..." class="w-full px-3 py-1.5 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto text-xs">
+                    <label class="text-[8px] font-black text-orange-400 uppercase tracking-tighter ml-1">Siapa Nama Kamu? (Wajib)</label>
+                    <input type="text" id="child-name" placeholder="Tulis nama di sini..." class="w-full px-3 py-1.5 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto text-xs transition-colors">
                 </div>
                 <div class="flex flex-col gap-0.5">
-                    <label class="text-[8px] font-black text-orange-400 uppercase tracking-tighter ml-1">Berapa Umur Kamu?</label>
-                    <input type="number" id="child-age" placeholder="Angka umur..." class="w-full px-3 py-1.5 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto text-xs">
+                    <label class="text-[8px] font-black text-orange-400 uppercase tracking-tighter ml-1">Berapa Umur Kamu? (Wajib)</label>
+                    <input type="number" id="child-age" placeholder="Angka umur..." class="w-full px-3 py-1.5 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto text-xs transition-colors">
                 </div>
+                <p id="error-msg" class="text-[8px] text-red-500 font-bold text-center hidden">Wah! Nama dan Umur harus diisi dulu ya! 😊</p>
             </div>
 
             <!-- Pilih Bentuk -->
@@ -152,15 +152,15 @@
     <!-- HALAMAN PERMAINAN (UI HUD) -->
     <div id="game-view" class="hidden fixed inset-0 ui-overlay flex flex-col p-3 pointer-events-none">
         <div class="flex justify-between items-start w-full">
-            <button onclick="backToMenu()" class="pointer-events-auto bg-white/90 p-2 rounded-xl shadow-lg border-2 border-white font-black text-gray-500 flex items-center gap-1 text-sm">
+            <button onclick="backToMenu()" class="pointer-events-auto bg-white/90 p-4 rounded-2xl shadow-lg border-2 border-white font-black text-gray-500 flex items-center gap-1 text-2xl">
                 🏠
             </button>
-            <div class="flex gap-1.5">
-                <div class="bg-white/90 px-3 py-1.5 rounded-xl shadow-lg border-2 border-white flex items-center gap-1.5 text-xs">
+            <div class="flex gap-2">
+                <div class="bg-white/90 px-5 py-2.5 rounded-2xl shadow-lg border-2 border-white flex items-center gap-2 text-lg">
                     <span>⏰</span>
                     <span id="timer" class="font-black text-gray-700">00:00</span>
                 </div>
-                <div class="bg-white/90 px-3 py-1.5 rounded-xl shadow-lg border-2 border-white flex items-center gap-1.5 text-xs">
+                <div class="bg-white/90 px-5 py-2.5 rounded-2xl shadow-lg border-2 border-white flex items-center gap-2 text-lg">
                     <span>🚀</span>
                     <span id="moves" class="font-black text-gray-700">0</span>
                 </div>
@@ -170,10 +170,10 @@
         <div class="flex-1"></div>
 
         <div class="flex gap-2 w-full pb-2">
-            <button onclick="shufflePieces()" class="pointer-events-auto flex-1 bg-orange-500 text-white py-3 rounded-2xl text-[11px] font-black shadow-xl">
+            <button onclick="shufflePieces()" class="pointer-events-auto flex-1 bg-orange-500 text-white py-4 rounded-2xl text-lg font-black shadow-xl">
                 🔄 Acak
             </button>
-            <button onclick="showPreview()" class="pointer-events-auto flex-1 bg-white/90 text-gray-500 py-3 rounded-2xl text-[11px] font-black shadow-xl border-2 border-white">
+            <button onclick="showPreview()" class="pointer-events-auto flex-1 bg-white/90 text-gray-500 py-4 rounded-2xl text-lg font-black shadow-xl border-2 border-white">
                 👁️ Intip
             </button>
         </div>
@@ -197,8 +197,9 @@
         const movesDisplay = document.getElementById('moves');
         const victoryScreen = document.getElementById('victory-screen');
         const nameInput = document.getElementById('child-name');
+        const ageInput = document.getElementById('child-age');
+        const errorMsg = document.getElementById('error-msg');
         const displayName = document.getElementById('display-name');
-        const soundIcon = document.getElementById('sound-icon');
         const homeView = document.getElementById('home-view');
         const gameView = document.getElementById('game-view');
 
@@ -243,12 +244,6 @@
             victory: () => { [523, 659, 783, 1046].forEach((f, i) => setTimeout(() => playTone(f, 'sine', 0.4), i * 150)); }
         };
 
-        function toggleSound() {
-            soundEnabled = !soundEnabled;
-            soundIcon.innerText = soundEnabled ? '🔊' : '🔇';
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-        }
-
         function setShape(shape) {
             sounds.click();
             currentShape = shape;
@@ -283,7 +278,30 @@
             if(pieces.length > 0) updatePiecesCoordinates();
         }
 
+        function validateInputs() {
+            let isValid = true;
+            nameInput.classList.remove('input-error');
+            ageInput.classList.remove('input-error');
+            errorMsg.classList.add('hidden');
+
+            if (!nameInput.value.trim()) {
+                nameInput.classList.add('input-error');
+                isValid = false;
+            }
+            if (!ageInput.value || ageInput.value <= 0) {
+                ageInput.classList.add('input-error');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                errorMsg.classList.remove('hidden');
+            }
+            return isValid;
+        }
+
         function startGame(level) {
+            if (!validateInputs()) return;
+
             if (audioCtx.state === 'suspended') audioCtx.resume();
             sounds.click();
             gridSize = level;
@@ -302,6 +320,8 @@
             canvas.classList.remove('hidden');
             isWin = false;
             victoryScreen.classList.add('hidden');
+            // Kosongkan kepingan agar tidak tertinggal visualnya di Home
+            pieces = []; 
         }
 
         function handleImageUpload(event) {
@@ -449,7 +469,7 @@
         function showPreview() { sounds.click(); showFullImage = true; setTimeout(() => { showFullImage = false; }, 3000); }
 
         function onPointerDown(e) {
-            if (isWin) return false;
+            if (isWin || gameView.classList.contains('hidden')) return false;
             const mouseX = e.clientX;
             const mouseY = e.clientY;
             let foundIndex = -1;
@@ -505,7 +525,10 @@
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // HANYA menggambar elemen game jika layar permainan aktif
             if (!gameView.classList.contains('hidden')) {
+                // Area target
                 ctx.save();
                 defineShapePath(ctx, targetX, targetY, targetSize, currentShape);
                 ctx.fillStyle = "rgba(0,0,0,0.03)";
@@ -514,6 +537,7 @@
                 ctx.lineWidth = 2;
                 ctx.stroke();
                 ctx.restore();
+
                 if (showFullImage) {
                     ctx.save();
                     defineShapePath(ctx, targetX, targetY, targetSize, currentShape);
@@ -523,6 +547,8 @@
                     ctx.drawImage(img, (img.width - minDim)/2, (img.height - minDim)/2, minDim, minDim, targetX, targetY, targetSize, targetSize);
                     ctx.restore();
                 }
+
+                // Grid bantu
                 ctx.save();
                 defineShapePath(ctx, targetX, targetY, targetSize, currentShape);
                 ctx.clip();
@@ -535,27 +561,30 @@
                     }
                 });
                 ctx.restore();
+
+                // Gambar kepingan
+                pieces.forEach(p => {
+                    ctx.save();
+                    if (selectedPiece === p) {
+                        ctx.shadowBlur = 40;
+                        ctx.shadowColor = "rgba(0,0,0,0.25)";
+                        ctx.shadowOffsetY = 10;
+                    }
+                    drawJigsawPath(ctx, p.x, p.y, pieceSize, p.sides);
+                    ctx.clip();
+                    ctx.save();
+                    const dx = p.x - p.correctX;
+                    const dy = p.y - p.correctY;
+                    ctx.translate(dx, dy);
+                    defineShapePath(ctx, targetX, targetY, targetSize, currentShape);
+                    ctx.restore();
+                    ctx.clip();
+                    ctx.drawImage(img, p.sx - p.srcStep * 0.3, p.sy - p.srcStep * 0.3, p.srcStep * 1.6, p.srcStep * 1.6, 
+                                p.x - pieceSize * 0.3, p.y - pieceSize * 0.3, pieceSize * 1.6, pieceSize * 1.6);
+                    ctx.restore();
+                });
             }
-            pieces.forEach(p => {
-                ctx.save();
-                if (selectedPiece === p) {
-                    ctx.shadowBlur = 40;
-                    ctx.shadowColor = "rgba(0,0,0,0.25)";
-                    ctx.shadowOffsetY = 10;
-                }
-                drawJigsawPath(ctx, p.x, p.y, pieceSize, p.sides);
-                ctx.clip();
-                ctx.save();
-                const dx = p.x - p.correctX;
-                const dy = p.y - p.correctY;
-                ctx.translate(dx, dy);
-                defineShapePath(ctx, targetX, targetY, targetSize, currentShape);
-                ctx.restore();
-                ctx.clip();
-                ctx.drawImage(img, p.sx - p.srcStep * 0.3, p.sy - p.srcStep * 0.3, p.srcStep * 1.6, p.srcStep * 1.6, 
-                              p.x - pieceSize * 0.3, p.y - pieceSize * 0.3, pieceSize * 1.6, pieceSize * 1.6);
-                ctx.restore();
-            });
+            
             requestAnimationFrame(draw);
         }
 
