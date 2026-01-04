@@ -32,20 +32,24 @@
             z-index: 10;
             pointer-events: none; /* Klik bisa tembus ke canvas */
         }
-        .ui-overlay button, .ui-overlay input, .ui-overlay .level-card {
+        .ui-overlay button, .ui-overlay input, .ui-overlay .level-card, .ui-overlay .shape-card {
             pointer-events: auto; /* Kecuali elemen interaktif */
         }
         .ui-panel {
             backdrop-filter: blur(12px);
             background-color: rgba(255, 255, 255, 0.9);
         }
-        .level-card {
+        .level-card, .shape-card {
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
             border: 2px solid #f3f4f6;
         }
-        .level-card:active {
+        .level-card:active, .shape-card:active {
             transform: scale(0.95);
+        }
+        .active-selection {
+            border-color: #fb923c !important;
+            background-color: #fff7ed !important;
         }
         .hidden { display: none !important; }
         
@@ -59,10 +63,10 @@
 </head>
 <body class="flex items-center justify-center">
 
-    <!-- CANVAS LAYAR PENUH (Background & Gameplay Area) -->
+    <!-- CANVAS LAYAR PENUH (Area Latar Belakang & Gameplay) -->
     <canvas id="game-canvas"></canvas>
 
-    <!-- AUDIO TOGGLE -->
+    <!-- PENGATURAN SUARA -->
     <button id="sound-toggle" onclick="toggleSound()" class="fixed top-4 right-4 z-50 bg-white p-3 rounded-full shadow-lg border-2 border-gray-100 hover:scale-110 transition-transform ui-overlay pointer-events-auto">
         <span id="sound-icon" class="text-xl">🔊</span>
     </button>
@@ -74,28 +78,52 @@
             <p class="text-gray-400 font-bold text-[10px] uppercase tracking-widest">Petualangan Seru!</p>
         </div>
 
-        <div class="space-y-3 mb-4 overflow-y-auto pr-1">
+        <div class="space-y-4 mb-4 overflow-y-auto pr-1">
+            <!-- Data Pemain -->
             <div class="bg-yellow-50 p-4 rounded-2xl border-2 border-yellow-100 space-y-3">
                 <input type="text" id="child-name" placeholder="Nama Kamu" class="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm">
                 <input type="number" id="child-age" placeholder="Umur" class="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm">
             </div>
 
-            <div class="grid grid-cols-2 gap-2">
-                <div onclick="startGame(2)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
-                    <span class="text-2xl">🌱</span>
-                    <span class="font-black text-gray-700 text-xs">2x2</span>
+            <!-- Pilih Bentuk -->
+            <div class="space-y-2">
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Pilih Bentuk Puzzle</p>
+                <div class="grid grid-cols-4 gap-2">
+                    <div onclick="setShape('square')" id="shape-square" class="shape-card active-selection p-2 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-xl">⬛</span>
+                    </div>
+                    <div onclick="setShape('circle')" id="shape-circle" class="shape-card p-2 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-xl">🔴</span>
+                    </div>
+                    <div onclick="setShape('triangle')" id="shape-triangle" class="shape-card p-2 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-xl">🔺</span>
+                    </div>
+                    <div onclick="setShape('star')" id="shape-star" class="shape-card p-2 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-xl">⭐</span>
+                    </div>
                 </div>
-                <div onclick="startGame(3)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
-                    <span class="text-2xl">🐣</span>
-                    <span class="font-black text-gray-700 text-xs">3x3</span>
-                </div>
-                <div onclick="startGame(4)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm border-orange-200">
-                    <span class="text-2xl">🦁</span>
-                    <span class="font-black text-gray-700 text-xs">4x4</span>
-                </div>
-                <div onclick="startGame(5)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
-                    <span class="text-2xl">🚀</span>
-                    <span class="font-black text-gray-700 text-xs">5x5</span>
+            </div>
+
+            <!-- Pilih Level -->
+            <div class="space-y-2">
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Pilih Level</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <div onclick="startGame(2)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-2xl">🌱</span>
+                        <span class="font-black text-gray-700 text-xs">2x2</span>
+                    </div>
+                    <div onclick="startGame(3)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-2xl">🐣</span>
+                        <span class="font-black text-gray-700 text-xs">3x3</span>
+                    </div>
+                    <div onclick="startGame(4)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-2xl">🦁</span>
+                        <span class="font-black text-gray-700 text-xs">4x4</span>
+                    </div>
+                    <div onclick="startGame(5)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-2xl">🚀</span>
+                        <span class="font-black text-gray-700 text-xs">5x5</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -140,11 +168,11 @@
             </button>
         </div>
 
-        <!-- Victory Overlay -->
-        <div id="victory-screen" class="hidden absolute inset-0 bg-white/95 flex flex-col items-center justify-center text-gray-900 rounded-[32px] z-20 shadow-2xl p-8 border-8 border-green-400 pointer-events-auto m-6">
+        <!-- Layar Kemenangan -->
+        <div id="victory-screen" class="hidden absolute inset-0 bg-white/95 flex flex-col items-center justify-center text-gray-900 rounded-[32px] z-20 shadow-2xl p-8 border-8 border-green-400 pointer-events-auto m-6 text-center">
             <div class="text-6xl mb-4 animate-bounce">🎉</div>
-            <h2 class="text-2xl font-black mb-1 text-center text-orange-500">Hebat, <span id="display-name">Jagoan</span>!</h2>
-            <p class="mb-6 text-gray-500 font-bold text-center">Kamu berhasil! 🌟</p>
+            <h2 class="text-2xl font-black mb-1 text-orange-500">Hebat, <span id="display-name">Jagoan</span>!</h2>
+            <p class="mb-6 text-gray-500 font-bold">Kamu berhasil menyelesaikan tantangan ini! 🌟</p>
             <div class="flex flex-col gap-2 w-full">
                 <button onclick="resetGame()" class="bg-green-500 text-white py-4 rounded-2xl font-black shadow-lg">Main Lagi! 🔁</button>
                 <button onclick="backToMenu()" class="bg-gray-100 text-gray-600 py-3 rounded-2xl font-black">Menu Utama</button>
@@ -168,6 +196,7 @@
         let pieces = [];
         let selectedPiece = null;
         let gridSize = 4;
+        let currentShape = 'square';
         let pieceSize, targetSize, targetX, targetY;
         let moves = 0;
         let startTime;
@@ -208,6 +237,13 @@
             soundEnabled = !soundEnabled;
             soundIcon.innerText = soundEnabled ? '🔊' : '🔇';
             if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function setShape(shape) {
+            sounds.click();
+            currentShape = shape;
+            document.querySelectorAll('.shape-card').forEach(card => card.classList.remove('active-selection'));
+            document.getElementById(`shape-${shape}`).classList.add('active-selection');
         }
 
         function init() {
@@ -320,6 +356,31 @@
                     p.y = p.correctY;
                 }
             });
+        }
+
+        /**
+         * Mendefinisikan jalur bentuk utama (Kotak, Bulat, Segitiga, Bintang)
+         */
+        function defineShapePath(context, x, y, size, shape) {
+            context.beginPath();
+            if (shape === 'circle') {
+                context.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2);
+            } else if (shape === 'triangle') {
+                context.moveTo(x + size / 2, y);
+                context.lineTo(x + size, y + size);
+                context.lineTo(x, y + size);
+            } else if (shape === 'star') {
+                const center = x + size / 2;
+                const centerY = y + size / 2;
+                for (let i = 0; i < 10; i++) {
+                    const angle = (Math.PI * 2 * i) / 10 - Math.PI / 2;
+                    const r = i % 2 === 0 ? size / 2 : size / 4;
+                    context.lineTo(center + r * Math.cos(angle), centerY + r * Math.sin(angle));
+                }
+            } else { // square
+                context.rect(x, y, size, size);
+            }
+            context.closePath();
         }
 
         function drawJigsawPath(context, x, y, size, sides) {
@@ -449,21 +510,32 @@
                 return;
             }
 
-            // Area target
+            // Area target latar belakang
+            ctx.save();
+            defineShapePath(ctx, targetX, targetY, targetSize, currentShape);
             ctx.fillStyle = "rgba(0,0,0,0.03)";
-            ctx.fillRect(targetX, targetY, targetSize, targetSize);
-            ctx.strokeStyle = "rgba(0,0,0,0.05)";
-            ctx.strokeRect(targetX, targetY, targetSize, targetSize);
+            ctx.fill();
+            ctx.strokeStyle = "rgba(0,0,0,0.1)";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.restore();
 
+            // Preview gambar penuh (Intip)
             if (showFullImage) {
                 ctx.save();
+                defineShapePath(ctx, targetX, targetY, targetSize, currentShape);
+                ctx.clip();
                 ctx.globalAlpha = 0.2;
                 const minDim = Math.min(img.width, img.height);
                 ctx.drawImage(img, (img.width - minDim)/2, (img.height - minDim)/2, minDim, minDim, targetX, targetY, targetSize, targetSize);
                 ctx.restore();
             }
 
-            ctx.strokeStyle = 'rgba(0,0,0,0.04)';
+            // Garis bantu grid (Puzzle guide) di canvas area target
+            ctx.save();
+            defineShapePath(ctx, targetX, targetY, targetSize, currentShape);
+            ctx.clip();
+            ctx.strokeStyle = 'rgba(0,0,0,0.05)';
             ctx.lineWidth = 1;
             pieces.forEach(p => {
                 if(!p.isSolved) {
@@ -471,35 +543,38 @@
                     ctx.stroke();
                 }
             });
+            ctx.restore();
 
+            // Menggambar kepingan puzzle
             pieces.forEach(p => {
                 ctx.save();
+                
                 if (selectedPiece === p) {
                     ctx.shadowBlur = 40;
                     ctx.shadowColor = "rgba(0,0,0,0.25)";
                     ctx.shadowOffsetY = 10;
-                    // Skala 1.0 (dihapus 1.08) untuk menjaga ukuran tetap sama persis
-                    ctx.scale(1.0, 1.0);
                 }
                 
+                // 1. Potong sesuai bentuk kepingan jigsaw
                 drawJigsawPath(ctx, p.x, p.y, pieceSize, p.sides);
                 ctx.clip();
                 
+                // 2. Potong sesuai bentuk bingkai utama dengan sinkronisasi posisi
+                ctx.save();
+                const dx = p.x - p.correctX;
+                const dy = p.y - p.correctY;
+                ctx.translate(dx, dy);
+                defineShapePath(ctx, targetX, targetY, targetSize, currentShape);
+                ctx.restore();
+                ctx.clip();
+                
+                // 3. Gambar tekstur foto
                 ctx.drawImage(img, 
                     p.sx - p.srcStep * 0.3, p.sy - p.srcStep * 0.3, p.srcStep * 1.6, p.srcStep * 1.6, 
                     p.x - pieceSize * 0.3, p.y - pieceSize * 0.3, pieceSize * 1.6, pieceSize * 1.6
                 );
-                ctx.restore();
                 
-                // Border kepingan - HANYA digambar jika kepingan TIDAK sedang dipilih (di-drag)
-                if (selectedPiece !== p) {
-                    ctx.save();
-                    drawJigsawPath(ctx, p.x, p.y, pieceSize, p.sides);
-                    ctx.strokeStyle = p.isSolved ? 'rgba(0,0,0,0.03)' : 'rgba(0,0,0,0.12)';
-                    ctx.lineWidth = 1.5;
-                    ctx.stroke();
-                    ctx.restore();
-                }
+                ctx.restore();
             });
             
             requestAnimationFrame(draw);
