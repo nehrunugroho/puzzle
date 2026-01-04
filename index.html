@@ -77,25 +77,25 @@
     <canvas id="game-canvas"></canvas>
 
     <!-- HALAMAN UTAMA -->
-    <div id="home-view" class="ui-overlay w-full max-w-sm ui-panel px-6 rounded-none shadow-none border-x-4 border-white fade-in flex flex-col h-screen justify-between">
+    <!-- h-screen untuk HP, h-auto untuk Desktop agar jadi kartu. rounded-none untuk HP, rounded-[48px] untuk Desktop -->
+    <div id="home-view" class="ui-overlay w-full max-w-md ui-panel px-6 rounded-none md:rounded-[48px] shadow-none md:shadow-2xl border-x-4 md:border-4 border-white fade-in flex flex-col h-screen md:h-auto md:max-h-[90dvh] justify-between overflow-hidden">
         
-        <!-- Header: Diberi padding atas lebih besar -->
-        <div class="text-center pt-10 pb-2">
-            <h1 class="text-3xl font-black text-orange-500 tracking-tight leading-tight">🧩 Jigsaw Master</h1>
-            <p class="text-gray-400 font-bold text-[10px] uppercase tracking-widest leading-none mt-1.5">Petualangan Seru!</p>
+        <!-- Header: pt-14 untuk HP agar tidak terpotong, md:pt-10 untuk Desktop -->
+        <div class="text-center pt-14 md:pt-10 pb-2">
+            <h1 class="text-4xl font-black text-orange-500 tracking-tight leading-tight">🧩 Jigsaw Master</h1>
+            <p class="text-gray-400 font-bold text-[10px] uppercase tracking-widest leading-none mt-2">Petualangan Seru!</p>
         </div>
 
-        <!-- Main Content: Menggunakan justify-evenly untuk membagi ruang kosong secara adil -->
-        <div class="flex-1 flex flex-col justify-evenly py-4 overflow-hidden">
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col justify-evenly py-6 overflow-hidden">
             <!-- Data Pemain -->
-            <div id="form-container" class="bg-yellow-50 p-4 rounded-2xl border-2 border-yellow-100 space-y-3 shadow-sm">
+            <div id="form-container" class="bg-yellow-50 p-4 rounded-3xl border-2 border-yellow-100 space-y-3 shadow-sm mx-1">
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[10px] font-black text-orange-400 uppercase tracking-tight ml-1">Siapa Nama Kamu? (Wajib)</label>
-                    <input type="text" id="child-name" placeholder="Tulis nama di sini..." class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto text-sm transition-colors">
+                    <!-- Label dihilangkan sesuai permintaan, diganti dengan placeholder -->
+                    <input type="text" id="child-name" placeholder="Siapa Nama Kamu? (Wajib)" class="w-full px-4 py-3 rounded-2xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto text-sm transition-colors">
                 </div>
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[10px] font-black text-orange-400 uppercase tracking-tight ml-1">Berapa Umur Kamu? (Wajib)</label>
-                    <input type="number" id="child-age" placeholder="Angka umur..." class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto text-sm transition-colors">
+                    <input type="number" id="child-age" placeholder="Berapa Umur Kamu? (Wajib)" class="w-full px-4 py-3 rounded-2xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto text-sm transition-colors">
                 </div>
                 <p id="error-msg" class="text-[9px] text-red-500 font-bold text-center hidden">Wah! Nama dan Umur harus diisi dulu ya! 😊</p>
             </div>
@@ -104,16 +104,16 @@
             <div class="space-y-2">
                 <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Pilih Bentuk Puzzle</p>
                 <div class="grid grid-cols-4 gap-2 px-1">
-                    <div onclick="setShape('square')" id="shape-square" class="shape-card active-selection p-2.5 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                    <div onclick="setShape('square')" id="shape-square" class="shape-card active-selection p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
                         <span class="text-2xl">⬛</span>
                     </div>
-                    <div onclick="setShape('circle')" id="shape-circle" class="shape-card p-2.5 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                    <div onclick="setShape('circle')" id="shape-circle" class="shape-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
                         <span class="text-2xl">🔴</span>
                     </div>
-                    <div onclick="setShape('triangle')" id="shape-triangle" class="shape-card p-2.5 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                    <div onclick="setShape('triangle')" id="shape-triangle" class="shape-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
                         <span class="text-2xl">🔺</span>
                     </div>
-                    <div onclick="setShape('star')" id="shape-star" class="shape-card p-2.5 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                    <div onclick="setShape('star')" id="shape-star" class="shape-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
                         <span class="text-2xl">⭐</span>
                     </div>
                 </div>
@@ -123,19 +123,19 @@
             <div class="space-y-2">
                 <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Pilih Level</p>
                 <div class="grid grid-cols-2 gap-3 px-1">
-                    <div onclick="startGame(2)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
+                    <div onclick="startGame(2)" class="level-card p-4 rounded-3xl bg-white flex flex-col items-center shadow-sm">
                         <span class="text-2xl">🌱</span>
                         <span class="font-black text-gray-700 text-xs mt-1">2x2</span>
                     </div>
-                    <div onclick="startGame(3)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
+                    <div onclick="startGame(3)" class="level-card p-4 rounded-3xl bg-white flex flex-col items-center shadow-sm">
                         <span class="text-2xl">🐣</span>
                         <span class="font-black text-gray-700 text-xs mt-1">3x3</span>
                     </div>
-                    <div onclick="startGame(4)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
+                    <div onclick="startGame(4)" class="level-card p-4 rounded-3xl bg-white flex flex-col items-center shadow-sm">
                         <span class="text-3xl leading-none">🦁</span>
                         <span class="font-black text-gray-700 text-xs mt-1">4x4</span>
                     </div>
-                    <div onclick="startGame(5)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
+                    <div onclick="startGame(5)" class="level-card p-4 rounded-3xl bg-white flex flex-col items-center shadow-sm">
                         <span class="text-3xl leading-none">🚀</span>
                         <span class="font-black text-gray-700 text-xs mt-1">5x5</span>
                     </div>
@@ -143,9 +143,9 @@
             </div>
         </div>
 
-        <!-- Footer: Diberi padding bawah lebih besar -->
-        <div class="flex flex-col pb-10 pt-2">
-            <label class="cursor-pointer bg-white text-blue-500 text-center py-4 rounded-2xl text-[11px] font-black border-2 border-blue-100 shadow-sm block pointer-events-auto hover:bg-blue-50 transition-colors">
+        <!-- Footer -->
+        <div class="flex flex-col pb-10 md:pb-8 pt-2">
+            <label class="cursor-pointer bg-white text-blue-500 text-center py-4 rounded-3xl text-[11px] font-black border-2 border-blue-100 shadow-sm block pointer-events-auto hover:bg-blue-50 transition-colors">
                 📸 Gunakan Foto Sendiri
                 <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
             </label>
@@ -413,6 +413,7 @@
                 const s = sides.top;
                 context.lineTo(x + size * (0.5 - neck), y);
                 context.bezierCurveTo(x + size * (0.5 - neck), y - tabSize * 0.1 * s, x + size * 0.2, y - tabSize * 0.9 * s, x + size * 0.5, y - tabSize * s);
+                context.bezierCurveTo(x + size * (0.5 + neck), y - tabSize * 0.1 * s, x + size * (0.5 + neck), y);
                 context.bezierCurveTo(x + size * 0.8, y - tabSize * 0.9 * s, x + size * (0.5 + neck), y - tabSize * 0.1 * s, x + size * (0.5 + neck), y);
             }
             context.lineTo(x + size, y);
