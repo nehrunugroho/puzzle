@@ -478,10 +478,8 @@
                     ctx.shadowBlur = 40;
                     ctx.shadowColor = "rgba(0,0,0,0.25)";
                     ctx.shadowOffsetY = 10;
-                    ctx.scale(1.08, 1.08);
-                    const scaleDiffX = (p.x * 0.08);
-                    const scaleDiffY = (p.y * 0.08);
-                    ctx.translate(-scaleDiffX/1.08, -scaleDiffY/1.08);
+                    // Skala 1.0 (dihapus 1.08) untuk menjaga ukuran tetap sama persis
+                    ctx.scale(1.0, 1.0);
                 }
                 
                 drawJigsawPath(ctx, p.x, p.y, pieceSize, p.sides);
