@@ -96,8 +96,8 @@
         
         <!-- Header -->
         <div class="text-center pt-12 md:pt-8 pb-2">
-            <!-- Saiz md:text-3xl untuk memastikan tajuk kekal 1 baris di komputer riba -->
-            <h1 class="text-4xl md:text-3xl font-black text-orange-600 tracking-tight leading-tight drop-shadow-md">🧩 Jigsaw Master</h1>
+            <!-- Saiz md:text-2xl untuk memastikan tajuk kekal 1 baris di komputer riba -->
+            <h1 class="text-4xl md:text-2xl font-black text-orange-600 tracking-tight leading-tight drop-shadow-md">🧩 Jigsaw Master</h1>
             <p class="text-blue-600 font-black text-[10px] md:text-xs uppercase tracking-widest leading-none mt-2 bg-blue-50 py-1 rounded-full inline-block px-4">Petualangan Seru Dimulai!</p>
         </div>
 
@@ -599,14 +599,14 @@
                 ctx.save(); // Simpan untuk masking imej
                 const dx = p.x - p.correctX;
                 const dy = p.y - p.correctY;
-                ctx.translate(dx, dy);
-                defineShapePath(ctx, targetX, targetY, targetSize, currentShape);
+                // defineShapePath kini menggunakan koordinat yang dikira mengikut kedudukan kepingan secara dinamik
+                defineShapePath(ctx, targetX + dx, targetY + dy, targetSize, currentShape);
                 ctx.clip();
                 
                 ctx.drawImage(img, p.sx - p.srcStep * 0.3, p.sy - p.srcStep * 0.3, p.srcStep * 1.6, p.srcStep * 1.6, 
                               p.x - pieceSize * 0.3, p.y - pieceSize * 0.3, pieceSize * 1.6, pieceSize * 1.6);
                 
-                ctx.restore(); // Lepaskan mask imej/translate
+                ctx.restore(); // Lepaskan mask imej
                 ctx.restore(); // Lepaskan klip kepingan/bayangan
             });
             
