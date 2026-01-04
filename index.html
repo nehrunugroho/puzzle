@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jigsaw Master Cilik</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #fef9c3; /* Kuning sangat muda yang ceria */
+            touch-action: none;
+            user-select: none;
+            font-family: 'Inter', sans-serif;
+        }
+        #game-canvas {
+            cursor: grab;
+            max-width: 100%;
+            height: auto;
+            background-color: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 8px solid white;
+        }
+        #game-canvas:active {
+            cursor: grabbing;
+        }
+        .ui-panel {
+            backdrop-filter: blur(12px);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        /* Gaya Tombol Level Baru */
+        .level-card {
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            border: 3px solid #f3f4f6;
+        }
+        .level-card:hover {
+            transform: scale(1.05);
+        }
+        .level-card.active {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2);
+        }
+        .level-card.active .stars {
+            color: #fbbf24;
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: #9ca3af;
+            font-weight: 400;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- Header Ceria -->
+    <div class="mb-6 text-center">
+        <h1 class="text-4xl md:text-5xl font-black text-orange-500 mb-2 tracking-tight drop-shadow-sm">🧩 Jigsaw Master</h1>
+        <div class="flex gap-6 justify-center text-sm font-bold text-gray-500 uppercase tracking-widest">
+            <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm">
+                <span class="text-blue-500 text-lg">⏰</span>
+                <span id="timer" class="text-gray-700">00:00</span>
+            </div>
+            <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm">
+                <span class="text-orange-500 text-lg">🚀</span>
+                <span id="moves" class="text-gray-700">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Area Game -->
+    <div class="relative">
+        <canvas id="game-canvas"></canvas>
+        
+        <!-- Layar Kemenangan -->
+        <div id="victory-screen" class="hidden absolute inset-0 bg-white/95 flex flex-col items-center justify-center text-gray-900 rounded-3xl z-20 shadow-2xl animate-in zoom-in duration-300">
+            <div class="text-8xl mb-4 animate-bounce">🎉</div>
+            <h2 class="text-4xl font-black mb-2 text-center text-orange-500">Hebat Sekali, <span id="display-name">Pemain</span>!</h2>
+            <p class="mb-8 text-gray-500 font-bold text-xl text-center">Kamu berhasil! Kamu pintar sekali! 🌟</p>
+            <button onclick="resetGame()" class="bg-green-500 hover:bg-green-600 text-white px-12 py-5 rounded-full text-xl font-black transition-all transform hover:scale-110 active:scale-95 shadow-xl">
+                Main Lagi! 🔁
+            </button>
+        </div>
+    </div>
+
+    <!-- Kontrol Panel -->
+    <div class="mt-8 ui-panel p-6 md:p-8 rounded-[40px] shadow-2xl border-4 border-white flex flex-col gap-8 w-full max-w-3xl">
+        
+        <!-- Data Pemain -->
+        <div class="space-y-4">
+            <h3 class="text-center font-black text-gray-400 text-xs uppercase tracking-widest">Siapa yang sedang bermain?</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <input type="text" id="child-name" placeholder="Nama Kamu" class="md:col-span-2 px-6 py-4 rounded-2xl border-2 border-gray-100 focus:border-orange-400 focus:ring-0 outline-none transition-all font-bold text-gray-700 text-lg shadow-sm">
+                <input type="number" id="child-age" placeholder="Umur" class="px-6 py-4 rounded-2xl border-2 border-gray-100 focus:border-orange-400 focus:ring-0 outline-none transition-all font-bold text-gray-700 text-lg shadow-sm">
+            </div>
+        </div>
+
+        <hr class="border-gray-100">
+
+        <!-- Pilihan Level Ramah Anak -->
+        <div>
+            <h3 class="text-center font-black text-gray-400 text-xs uppercase tracking-widest mb-4">Pilih Level Serumu!</h3>
+            <div id="difficulty-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-4">
+                <!-- Level 2x2 -->
+                <div onclick="setDifficulty(2)" id="level-2" class="level-card p-4 rounded-3xl bg-white flex flex-col items-center gap-1 shadow-sm">
+                    <span class="text-2xl">🌱</span>
+                    <span class="font-black text-gray-700">Sangat Mudah</span>
+                    <span class="stars text-gray-300 text-xs">★☆☆☆☆</span>
+                </div>
+                <!-- Level 3x3 -->
+                <div onclick="setDifficulty(3)" id="level-3" class="level-card p-4 rounded-3xl bg-white flex flex-col items-center gap-1 shadow-sm">
+                    <span class="text-2xl">🐣</span>
+                    <span class="font-black text-gray-700">Mudah</span>
+                    <span class="stars text-gray-300 text-xs">★★☆☆☆</span>
+                </div>
+                <!-- Level 4x4 -->
+                <div onclick="setDifficulty(4)" id="level-4" class="level-card p-4 rounded-3xl bg-white flex flex-col items-center gap-1 shadow-sm active">
+                    <span class="text-2xl">🦁</span>
+                    <span class="font-black text-gray-700">Bisa!</span>
+                    <span class="stars text-gray-300 text-xs">★★★☆☆</span>
+                </div>
+                <!-- Level 5x5 -->
+                <div onclick="setDifficulty(5)" id="level-5" class="level-card p-4 rounded-3xl bg-white flex flex-col items-center gap-1 shadow-sm">
+                    <span class="text-2xl">🚀</span>
+                    <span class="font-black text-gray-700">Jagoan</span>
+                    <span class="stars text-gray-300 text-xs">★★★★☆</span>
+                </div>
+                <!-- Level 6x6 -->
+                <div onclick="setDifficulty(6)" id="level-6" class="level-card p-4 rounded-3xl bg-white flex flex-col items-center gap-1 shadow-sm">
+                    <span class="text-2xl">🦅</span>
+                    <span class="font-black text-gray-700">Hebat</span>
+                    <span class="stars text-gray-300 text-xs">★★★★★</span>
+                </div>
+                <!-- Level 8x8 (Lompat untuk variasi) -->
+                <div onclick="setDifficulty(8)" id="level-8" class="level-card p-4 rounded-3xl bg-white flex flex-col items-center gap-1 shadow-sm">
+                    <span class="text-2xl">👑</span>
+                    <span class="font-black text-gray-700">Master</span>
+                    <span class="stars text-gray-300 text-xs">★★★★★★</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tombol Aksi -->
+        <div class="flex flex-wrap gap-4 items-center justify-center pt-2">
+            <label class="cursor-pointer bg-white text-blue-500 hover:bg-blue-50 px-8 py-4 rounded-3xl text-sm font-black transition-all flex items-center gap-2 border-2 border-blue-100 shadow-sm">
+                📸 Ganti Foto
+                <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+            </label>
+
+            <button onclick="shufflePieces()" class="bg-orange-500 hover:bg-orange-600 text-white px-10 py-4 rounded-3xl text-sm font-black transition-all shadow-lg flex items-center gap-2">
+                🔄 Acak Lagi
+            </button>
+
+            <button onclick="showPreview()" class="bg-white border-2 border-gray-100 hover:border-gray-200 text-gray-500 px-8 py-4 rounded-3xl text-sm font-black transition-all shadow-sm">
+                👁️ Intip
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const timerDisplay = document.getElementById('timer');
+        const movesDisplay = document.getElementById('moves');
+        const victoryScreen = document.getElementById('victory-screen');
+        const nameInput = document.getElementById('child-name');
+        const displayName = document.getElementById('display-name');
+
+        let img = new Image();
+        let pieces = [];
+        let selectedPiece = null;
+        let gridSize = 4;
+        let pieceSize;
+        let moves = 0;
+        let startTime;
+        let timerInterval;
+        let isWin = false;
+        let showFullImage = false;
+
+        let currentImageUrl = 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=1200&q=80'; // Gambar buah yang lebih ceria
+
+        function init() {
+            img.onload = () => {
+                setupCanvas();
+                createPieces();
+                shufflePieces();
+                startTimer();
+                animate();
+            };
+            img.src = currentImageUrl;
+
+            canvas.addEventListener('mousedown', onPointerDown);
+            canvas.addEventListener('mousemove', onPointerMove);
+            window.addEventListener('mouseup', onPointerUp);
+            canvas.addEventListener('touchstart', (e) => { e.preventDefault(); onPointerDown(e.touches[0]); }, { passive: false });
+            canvas.addEventListener('touchmove', (e) => { e.preventDefault(); onPointerMove(e.touches[0]); }, { passive: false });
+            window.addEventListener('touchend', onPointerUp);
+        }
+
+        function setupCanvas() {
+            const size = Math.min(window.innerWidth - 60, 600);
+            canvas.width = size;
+            canvas.height = size;
+            pieceSize = canvas.width / gridSize;
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    currentImageUrl = e.target.result;
+                    img.src = currentImageUrl;
+                    resetGame();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function setDifficulty(level) {
+            gridSize = level;
+            // Update UI Level Cards
+            document.querySelectorAll('.level-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            const activeCard = document.getElementById(`level-${level}`);
+            if(activeCard) activeCard.classList.add('active');
+            
+            resetGame();
+        }
+
+        function createPieces() {
+            pieces = [];
+            const vSides = [];
+            const hSides = [];
+
+            for (let i = 0; i <= gridSize; i++) {
+                vSides[i] = []; hSides[i] = [];
+                for (let j = 0; j <= gridSize; j++) {
+                    vSides[i][j] = (j === 0 || j === gridSize) ? 0 : (Math.random() > 0.5 ? 1 : -1);
+                    hSides[i][j] = (i === 0 || i === gridSize) ? 0 : (Math.random() > 0.5 ? 1 : -1);
+                }
+            }
+
+            const minDim = Math.min(img.width, img.height);
+            const sourceStartX = (img.width - minDim) / 2;
+            const sourceStartY = (img.height - minDim) / 2;
+            const sourceStep = minDim / gridSize;
+
+            for (let y = 0; y < gridSize; y++) {
+                for (let x = 0; x < gridSize; x++) {
+                    pieces.push({
+                        sx: sourceStartX + x * sourceStep,
+                        sy: sourceStartY + y * sourceStep,
+                        sourceSquareSize: sourceStep,
+                        correctX: x * pieceSize,
+                        correctY: y * pieceSize,
+                        x: x * pieceSize,
+                        y: y * pieceSize,
+                        isSolved: false,
+                        sides: {
+                            top: -hSides[y][x],
+                            right: vSides[y][x+1],
+                            bottom: hSides[y+1][x],
+                            left: -vSides[y][x]
+                        }
+                    });
+                }
+            }
+        }
+
+        function drawJigsawPath(context, x, y, size, sides) {
+            const tabSize = size * 0.28;
+            const neck = 0.12;
+            context.beginPath();
+            context.moveTo(x, y);
+
+            if (sides.top !== 0) {
+                const s = sides.top;
+                context.lineTo(x + size * (0.5 - neck), y);
+                context.bezierCurveTo(x + size * (0.5 - neck), y - tabSize * 0.1 * s, x + size * 0.2, y - tabSize * 0.9 * s, x + size * 0.5, y - tabSize * s);
+                context.bezierCurveTo(x + size * 0.8, y - tabSize * 0.9 * s, x + size * (0.5 + neck), y - tabSize * 0.1 * s, x + size * (0.5 + neck), y);
+            }
+            context.lineTo(x + size, y);
+
+            if (sides.right !== 0) {
+                const s = sides.right;
+                context.lineTo(x + size, y + size * (0.5 - neck));
+                context.bezierCurveTo(x + size + tabSize * 0.1 * s, y + size * (0.5 - neck), x + size + tabSize * 0.9 * s, y + size * 0.2, x + size + tabSize * s, y + size * 0.5);
+                context.bezierCurveTo(x + size + tabSize * 0.9 * s, y + size * 0.8, x + size + tabSize * 0.1 * s, y + size * (0.5 + neck), x + size, y + size * (0.5 + neck));
+            }
+            context.lineTo(x + size, y + size);
+
+            if (sides.bottom !== 0) {
+                const s = sides.bottom;
+                context.lineTo(x + size * (0.5 + neck), y + size);
+                context.bezierCurveTo(x + size * (0.5 + neck), y + size + tabSize * 0.1 * s, x + size * 0.8, y + size + tabSize * 0.9 * s, x + size * 0.5, y + size + tabSize * s);
+                context.bezierCurveTo(x + size * 0.2, y + size + tabSize * 0.9 * s, x + size * (0.5 - neck), y + size + tabSize * 0.1 * s, x + size * (0.5 - neck), y + size);
+            }
+            context.lineTo(x, y + size);
+
+            if (sides.left !== 0) {
+                const s = sides.left;
+                context.lineTo(x, y + size * (0.5 + neck));
+                context.bezierCurveTo(x - tabSize * 0.1 * s, y + size * (0.5 + neck), x - tabSize * 0.9 * s, y + size * 0.8, x - tabSize * s, y + size * 0.5);
+                context.bezierCurveTo(x - tabSize * 0.9 * s, y + size * 0.2, x - tabSize * 0.1 * s, y + size * (0.5 - neck), x, y + size * (0.5 - neck));
+            }
+            context.closePath();
+        }
+
+        function shufflePieces() {
+            isWin = false;
+            moves = 0;
+            movesDisplay.innerText = moves;
+            victoryScreen.classList.add('hidden');
+            pieces.forEach(p => {
+                p.x = 20 + Math.random() * (canvas.width - pieceSize - 40);
+                p.y = 20 + Math.random() * (canvas.height - pieceSize - 40);
+                p.isSolved = false;
+            });
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            startTime = Date.now();
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
+                const secs = (elapsed % 60).toString().padStart(2, '0');
+                timerDisplay.innerText = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function resetGame() {
+            setupCanvas();
+            createPieces();
+            shufflePieces();
+        }
+
+        function showPreview() {
+            showFullImage = true;
+            setTimeout(() => { showFullImage = false; }, 3000);
+        }
+
+        function onPointerDown(e) {
+            if (isWin) return;
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            for (let i = pieces.length - 1; i >= 0; i--) {
+                const p = pieces[i];
+                if (!p.isSolved && mouseX > p.x && mouseX < p.x + pieceSize && mouseY > p.y && mouseY < p.y + pieceSize) {
+                    selectedPiece = p;
+                    pieces.splice(i, 1);
+                    pieces.push(selectedPiece);
+                    selectedPiece.offsetX = mouseX - p.x;
+                    selectedPiece.offsetY = mouseY - p.y;
+                    break;
+                }
+            }
+        }
+
+        function onPointerMove(e) {
+            if (!selectedPiece || isWin) return;
+            const rect = canvas.getBoundingClientRect();
+            selectedPiece.x = e.clientX - rect.left - selectedPiece.offsetX;
+            selectedPiece.y = e.clientY - rect.top - selectedPiece.offsetY;
+        }
+
+        function onPointerUp() {
+            if (!selectedPiece) return;
+            const snapDist = Math.max(pieceSize * 0.3, 20); // Toleransi lebih luas untuk anak-anak
+            const dist = Math.hypot(selectedPiece.x - selectedPiece.correctX, selectedPiece.y - selectedPiece.correctY);
+            
+            if (dist < snapDist) {
+                selectedPiece.x = selectedPiece.correctX;
+                selectedPiece.y = selectedPiece.correctY;
+                selectedPiece.isSolved = true;
+                if (pieces.every(p => p.isSolved)) {
+                    isWin = true;
+                    clearInterval(timerInterval);
+                    displayName.innerText = nameInput.value.trim() || "Jagoan";
+                    setTimeout(() => victoryScreen.classList.remove('hidden'), 500);
+                }
+            }
+            moves++;
+            movesDisplay.innerText = moves;
+            selectedPiece = null;
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (showFullImage) {
+                ctx.save();
+                ctx.globalAlpha = 0.3;
+                const minDim = Math.min(img.width, img.height);
+                ctx.drawImage(img, (img.width - minDim)/2, (img.height - minDim)/2, minDim, minDim, 0, 0, canvas.width, canvas.height);
+                ctx.restore();
+                return;
+            }
+
+            // Panduan halus
+            ctx.strokeStyle = 'rgba(0,0,0,0.05)';
+            ctx.lineWidth = 1;
+            pieces.forEach(p => {
+                if(!p.isSolved) {
+                    ctx.save();
+                    drawJigsawPath(ctx, p.correctX, p.correctY, pieceSize, p.sides);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+
+            // Kepingan
+            pieces.forEach(p => {
+                ctx.save();
+                if (selectedPiece === p) {
+                    ctx.shadowBlur = 30;
+                    ctx.shadowColor = "rgba(0,0,0,0.3)";
+                    ctx.shadowOffsetY = 15;
+                    ctx.scale(1.02, 1.02); // Sedikit membesar saat dipegang
+                }
+                drawJigsawPath(ctx, p.x, p.y, pieceSize, p.sides);
+                ctx.clip();
+                ctx.drawImage(img, p.sx - p.sourceSquareSize * 0.3, p.sy - p.sourceSquareSize * 0.3, p.sourceSquareSize * 1.6, p.sourceSquareSize * 1.6, 
+                              p.x - pieceSize * 0.3, p.y - pieceSize * 0.3, pieceSize * 1.6, pieceSize * 1.6);
+                ctx.restore();
+                
+                ctx.save();
+                drawJigsawPath(ctx, p.x, p.y, pieceSize, p.sides);
+                ctx.strokeStyle = p.isSolved ? 'rgba(0,0,0,0.05)' : 'rgba(0,0,0,0.15)';
+                ctx.lineWidth = gridSize > 7 ? 1 : 2;
+                ctx.stroke();
+                ctx.restore();
+            });
+        }
+
+        function animate() {
+            draw();
+            requestAnimationFrame(animate);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
