@@ -19,21 +19,21 @@
             width: 100vw;
             height: 100dvh;
         }
+        /* Canvas di lapisan teratas agar kepingan menutupi menu */
         #game-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 0;
+            z-index: 20; 
+            pointer-events: none; /* Klik tembus ke UI di bawah jika tidak kena kepingan */
         }
+        /* UI Overlay berada di bawah kepingan puzzle (z-index 10) */
         .ui-overlay {
             position: relative;
             z-index: 10;
-            pointer-events: none; /* Klik bisa tembus ke canvas */
-        }
-        .ui-overlay button, .ui-overlay input, .ui-overlay .level-card, .ui-overlay .shape-card {
-            pointer-events: auto; /* Kecuali elemen interaktif */
+            pointer-events: auto;
         }
         .ui-panel {
             backdrop-filter: blur(12px);
@@ -53,26 +53,26 @@
         }
         .hidden { display: none !important; }
         
-        /* Animasi */
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        input, button { pointer-events: auto; }
     </style>
 </head>
 <body class="flex items-center justify-center">
 
-    <!-- CANVAS LAYAR PENUH (Area Latar Belakang & Gameplay) -->
+    <!-- CANVAS LAYAR PENUH -->
     <canvas id="game-canvas"></canvas>
 
     <!-- PENGATURAN SUARA -->
-    <button id="sound-toggle" onclick="toggleSound()" class="fixed top-4 right-4 z-50 bg-white p-3 rounded-full shadow-lg border-2 border-gray-100 hover:scale-110 transition-transform ui-overlay pointer-events-auto">
+    <button id="sound-toggle" onclick="toggleSound()" class="fixed top-4 right-4 z-[30] bg-white p-3 rounded-full shadow-lg border-2 border-gray-100 hover:scale-110 transition-transform pointer-events-auto">
         <span id="sound-icon" class="text-xl">🔊</span>
     </button>
 
     <!-- HALAMAN UTAMA -->
-    <div id="home-view" class="ui-overlay pointer-events-auto w-[90%] max-w-md ui-panel p-6 rounded-[40px] shadow-2xl border-4 border-white fade-in flex flex-col max-h-[90dvh]">
+    <div id="home-view" class="ui-overlay w-[90%] max-w-md ui-panel p-6 rounded-[40px] shadow-2xl border-4 border-white fade-in flex flex-col max-h-[90dvh]">
         <div class="text-center mb-4">
             <h1 class="text-3xl font-black text-orange-500 tracking-tight">🧩 Jigsaw Master</h1>
             <p class="text-gray-400 font-bold text-[10px] uppercase tracking-widest">Petualangan Seru!</p>
@@ -81,8 +81,8 @@
         <div class="space-y-4 mb-4 overflow-y-auto pr-1">
             <!-- Data Pemain -->
             <div class="bg-yellow-50 p-4 rounded-2xl border-2 border-yellow-100 space-y-3">
-                <input type="text" id="child-name" placeholder="Nama Kamu" class="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm">
-                <input type="number" id="child-age" placeholder="Umur" class="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm">
+                <input type="text" id="child-name" placeholder="Nama Kamu" class="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto">
+                <input type="number" id="child-age" placeholder="Umur" class="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto">
             </div>
 
             <!-- Pilih Bentuk -->
@@ -129,7 +129,7 @@
         </div>
 
         <div class="flex flex-col gap-2">
-            <label class="cursor-pointer bg-white text-blue-500 text-center py-3 rounded-2xl text-xs font-black border-2 border-blue-100 shadow-sm block">
+            <label class="cursor-pointer bg-white text-blue-500 text-center py-3 rounded-2xl text-xs font-black border-2 border-blue-100 shadow-sm block pointer-events-auto">
                 📸 Pilih Foto Sendiri
                 <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
             </label>
@@ -138,7 +138,6 @@
 
     <!-- HALAMAN PERMAINAN (UI HUD) -->
     <div id="game-view" class="hidden fixed inset-0 ui-overlay flex flex-col p-4 pointer-events-none">
-        <!-- Header HUD -->
         <div class="flex justify-between items-start w-full">
             <button onclick="backToMenu()" class="pointer-events-auto bg-white/90 p-3 rounded-2xl shadow-lg border-2 border-white font-black text-gray-500 flex items-center gap-2">
                 🏠
@@ -155,10 +154,8 @@
             </div>
         </div>
 
-        <!-- Spacer tengah -->
         <div class="flex-1"></div>
 
-        <!-- Footer HUD -->
         <div class="flex gap-3 w-full pb-4">
             <button onclick="shufflePieces()" class="pointer-events-auto flex-1 bg-orange-500 text-white py-4 rounded-3xl text-sm font-black shadow-xl">
                 🔄 Acak
@@ -168,8 +165,8 @@
             </button>
         </div>
 
-        <!-- Layar Kemenangan -->
-        <div id="victory-screen" class="hidden absolute inset-0 bg-white/95 flex flex-col items-center justify-center text-gray-900 rounded-[32px] z-20 shadow-2xl p-8 border-8 border-green-400 pointer-events-auto m-6 text-center">
+        <!-- Victory Overlay -->
+        <div id="victory-screen" class="hidden absolute inset-0 bg-white/95 flex flex-col items-center justify-center text-gray-900 rounded-[32px] z-[100] shadow-2xl p-8 border-8 border-green-400 pointer-events-auto m-6 text-center">
             <div class="text-6xl mb-4 animate-bounce">🎉</div>
             <h2 class="text-2xl font-black mb-1 text-orange-500">Hebat, <span id="display-name">Jagoan</span>!</h2>
             <p class="mb-6 text-gray-500 font-bold">Kamu berhasil menyelesaikan tantangan ini! 🌟</p>
@@ -247,32 +244,41 @@
         }
 
         function init() {
-            img.onload = () => { 
-                animate(); 
-            };
+            img.onload = () => { animate(); };
             img.src = currentImageUrl;
 
             window.addEventListener('resize', setupDimensions);
-            canvas.addEventListener('mousedown', onPointerDown);
+            
+            // Interaksi ditangkap di window agar bisa deteksi kepingan maupun UI
+            window.addEventListener('mousedown', onPointerDown);
             window.addEventListener('mousemove', onPointerMove);
             window.addEventListener('mouseup', onPointerUp);
-            canvas.addEventListener('touchstart', (e) => { e.preventDefault(); onPointerDown(e.touches[0]); }, { passive: false });
-            window.addEventListener('touchmove', (e) => { onPointerMove(e.touches[0]); }, { passive: false });
+            
+            window.addEventListener('touchstart', (e) => { 
+                // Cek kepingan dulu
+                if (onPointerDown(e.touches[0])) {
+                    e.preventDefault(); // Hanya cegah default jika kena kepingan
+                }
+            }, { passive: false });
+            
+            window.addEventListener('touchmove', (e) => { 
+                if (selectedPiece) {
+                    e.preventDefault();
+                    onPointerMove(e.touches[0]);
+                }
+            }, { passive: false });
+            
             window.addEventListener('touchend', onPointerUp);
         }
 
         function setupDimensions() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            
             targetSize = Math.min(canvas.width * 0.85, canvas.height * 0.5);
             targetX = (canvas.width - targetSize) / 2;
             targetY = (canvas.height - targetSize) / 2;
             pieceSize = targetSize / gridSize;
-            
-            if(pieces.length > 0) {
-                updatePiecesCoordinates();
-            }
+            if(pieces.length > 0) updatePiecesCoordinates();
         }
 
         function startGame(level) {
@@ -311,7 +317,6 @@
             pieces = [];
             const vSides = [];
             const hSides = [];
-
             for (let i = 0; i <= gridSize; i++) {
                 vSides[i] = []; hSides[i] = [];
                 for (let j = 0; j <= gridSize; j++) {
@@ -319,20 +324,17 @@
                     hSides[i][j] = (i === 0 || i === gridSize) ? 0 : (Math.random() > 0.5 ? 1 : -1);
                 }
             }
-
             const minDim = Math.min(img.width, img.height);
             const sourceStartX = (img.width - minDim) / 2;
             const sourceStartY = (img.height - minDim) / 2;
             const sourceStep = minDim / gridSize;
-
             for (let y = 0; y < gridSize; y++) {
                 for (let x = 0; x < gridSize; x++) {
                     pieces.push({
                         sx: sourceStartX + x * sourceStep,
                         sy: sourceStartY + y * sourceStep,
                         srcStep: sourceStep,
-                        gridX: x,
-                        gridY: y,
+                        gridX: x, gridY: y,
                         x: 0, y: 0,
                         isSolved: false,
                         sides: {
@@ -351,16 +353,10 @@
             pieces.forEach(p => {
                 p.correctX = targetX + p.gridX * pieceSize;
                 p.correctY = targetY + p.gridY * pieceSize;
-                if(p.isSolved) {
-                    p.x = p.correctX;
-                    p.y = p.correctY;
-                }
+                if(p.isSolved) { p.x = p.correctX; p.y = p.correctY; }
             });
         }
 
-        /**
-         * Mendefinisikan jalur bentuk utama (Kotak, Bulat, Segitiga, Bintang)
-         */
         function defineShapePath(context, x, y, size, shape) {
             context.beginPath();
             if (shape === 'circle') {
@@ -377,9 +373,7 @@
                     const r = i % 2 === 0 ? size / 2 : size / 4;
                     context.lineTo(center + r * Math.cos(angle), centerY + r * Math.sin(angle));
                 }
-            } else { // square
-                context.rect(x, y, size, size);
-            }
+            } else { context.rect(x, y, size, size); }
             context.closePath();
         }
 
@@ -441,34 +435,37 @@
             }, 1000);
         }
 
-        function resetGame() {
-            createPieces();
-            shufflePieces();
-        }
-
-        function showPreview() {
-            sounds.click();
-            showFullImage = true;
-            setTimeout(() => { showFullImage = false; }, 3000);
-        }
+        function resetGame() { createPieces(); shufflePieces(); }
+        function showPreview() { sounds.click(); showFullImage = true; setTimeout(() => { showFullImage = false; }, 3000); }
 
         function onPointerDown(e) {
-            if (isWin || gameView.classList.contains('hidden')) return;
+            if (isWin) return false;
+            
             const mouseX = e.clientX;
             const mouseY = e.clientY;
 
+            // Cari kepingan puzzle
+            let foundIndex = -1;
+            // Hanya deteksi kepingan jika game view aktif (atau jika kepingan ada di luar menu di home view)
             for (let i = pieces.length - 1; i >= 0; i--) {
                 const p = pieces[i];
                 if (!p.isSolved && mouseX > p.x && mouseX < p.x + pieceSize && mouseY > p.y && mouseY < p.y + pieceSize) {
-                    sounds.pickup();
-                    selectedPiece = p;
-                    pieces.splice(i, 1);
-                    pieces.push(selectedPiece);
-                    selectedPiece.offsetX = mouseX - p.x;
-                    selectedPiece.offsetY = mouseY - p.y;
+                    foundIndex = i;
                     break;
                 }
             }
+
+            if (foundIndex !== -1) {
+                sounds.pickup();
+                selectedPiece = pieces[foundIndex];
+                pieces.splice(foundIndex, 1);
+                pieces.push(selectedPiece); 
+                selectedPiece.offsetX = mouseX - selectedPiece.x;
+                selectedPiece.offsetY = mouseY - selectedPiece.y;
+                return true; // Berhasil pegang kepingan
+            }
+            
+            return false; // Tidak pegang apa pun, biarkan event tembus ke UI
         }
 
         function onPointerMove(e) {
@@ -481,7 +478,6 @@
             if (!selectedPiece) return;
             const snapDist = pieceSize * 0.4;
             const dist = Math.hypot(selectedPiece.x - selectedPiece.correctX, selectedPiece.y - selectedPiece.correctY);
-            
             if (dist < snapDist) {
                 selectedPiece.x = selectedPiece.correctX;
                 selectedPiece.y = selectedPiece.correctY;
@@ -494,9 +490,7 @@
                     sounds.victory();
                     setTimeout(() => victoryScreen.classList.remove('hidden'), 400);
                 }
-            } else {
-                sounds.drop();
-            }
+            } else { sounds.drop(); }
             moves++;
             movesDisplay.innerText = moves;
             selectedPiece = null;
@@ -505,61 +499,53 @@
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            if (gameView.classList.contains('hidden')) {
-                requestAnimationFrame(draw);
-                return;
-            }
+            // Render elemen puzzle hanya jika tidak di home view (opsional, tapi di sini kita tampilkan kepingan yang berceceran jika ada)
+            if (!gameView.classList.contains('hidden')) {
+                // Area target
+                ctx.save();
+                defineShapePath(ctx, targetX, targetY, targetSize, currentShape);
+                ctx.fillStyle = "rgba(0,0,0,0.03)";
+                ctx.fill();
+                ctx.strokeStyle = "rgba(0,0,0,0.1)";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.restore();
 
-            // Area target latar belakang
-            ctx.save();
-            defineShapePath(ctx, targetX, targetY, targetSize, currentShape);
-            ctx.fillStyle = "rgba(0,0,0,0.03)";
-            ctx.fill();
-            ctx.strokeStyle = "rgba(0,0,0,0.1)";
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            ctx.restore();
+                if (showFullImage) {
+                    ctx.save();
+                    defineShapePath(ctx, targetX, targetY, targetSize, currentShape);
+                    ctx.clip();
+                    ctx.globalAlpha = 0.2;
+                    const minDim = Math.min(img.width, img.height);
+                    ctx.drawImage(img, (img.width - minDim)/2, (img.height - minDim)/2, minDim, minDim, targetX, targetY, targetSize, targetSize);
+                    ctx.restore();
+                }
 
-            // Preview gambar penuh (Intip)
-            if (showFullImage) {
+                // Grid bantu
                 ctx.save();
                 defineShapePath(ctx, targetX, targetY, targetSize, currentShape);
                 ctx.clip();
-                ctx.globalAlpha = 0.2;
-                const minDim = Math.min(img.width, img.height);
-                ctx.drawImage(img, (img.width - minDim)/2, (img.height - minDim)/2, minDim, minDim, targetX, targetY, targetSize, targetSize);
+                ctx.strokeStyle = 'rgba(0,0,0,0.05)';
+                ctx.lineWidth = 1;
+                pieces.forEach(p => {
+                    if(!p.isSolved) {
+                        drawJigsawPath(ctx, p.correctX, p.correctY, pieceSize, p.sides);
+                        ctx.stroke();
+                    }
+                });
                 ctx.restore();
             }
 
-            // Garis bantu grid (Puzzle guide) di canvas area target
-            ctx.save();
-            defineShapePath(ctx, targetX, targetY, targetSize, currentShape);
-            ctx.clip();
-            ctx.strokeStyle = 'rgba(0,0,0,0.05)';
-            ctx.lineWidth = 1;
-            pieces.forEach(p => {
-                if(!p.isSolved) {
-                    drawJigsawPath(ctx, p.correctX, p.correctY, pieceSize, p.sides);
-                    ctx.stroke();
-                }
-            });
-            ctx.restore();
-
-            // Menggambar kepingan puzzle
+            // Gambar kepingan di semua kondisi (selama ada kepingan)
             pieces.forEach(p => {
                 ctx.save();
-                
                 if (selectedPiece === p) {
                     ctx.shadowBlur = 40;
                     ctx.shadowColor = "rgba(0,0,0,0.25)";
                     ctx.shadowOffsetY = 10;
                 }
-                
-                // 1. Potong sesuai bentuk kepingan jigsaw
                 drawJigsawPath(ctx, p.x, p.y, pieceSize, p.sides);
                 ctx.clip();
-                
-                // 2. Potong sesuai bentuk bingkai utama dengan sinkronisasi posisi
                 ctx.save();
                 const dx = p.x - p.correctX;
                 const dy = p.y - p.correctY;
@@ -567,23 +553,15 @@
                 defineShapePath(ctx, targetX, targetY, targetSize, currentShape);
                 ctx.restore();
                 ctx.clip();
-                
-                // 3. Gambar tekstur foto
-                ctx.drawImage(img, 
-                    p.sx - p.srcStep * 0.3, p.sy - p.srcStep * 0.3, p.srcStep * 1.6, p.srcStep * 1.6, 
-                    p.x - pieceSize * 0.3, p.y - pieceSize * 0.3, pieceSize * 1.6, pieceSize * 1.6
-                );
-                
+                ctx.drawImage(img, p.sx - p.srcStep * 0.3, p.sy - p.srcStep * 0.3, p.srcStep * 1.6, p.srcStep * 1.6, 
+                              p.x - pieceSize * 0.3, p.y - pieceSize * 0.3, pieceSize * 1.6, pieceSize * 1.6);
                 ctx.restore();
             });
             
             requestAnimationFrame(draw);
         }
 
-        function animate() {
-            draw();
-        }
-
+        function animate() { draw(); }
         window.onload = init;
     </script>
 </body>
