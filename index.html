@@ -11,7 +11,8 @@
             --safe-bottom: env(safe-area-inset-bottom);
         }
         body {
-            background-color: #fef9c3;
+            /* Latar belakang dengan gradasi warna pastel yang ceria */
+            background: linear-gradient(135deg, #fef9c3 0%, #dcfce7 50%, #dbeafe 100%);
             touch-action: none;
             user-select: none;
             font-family: 'Inter', sans-serif;
@@ -39,20 +40,21 @@
             pointer-events: auto;
         }
         .ui-panel {
-            backdrop-filter: blur(12px);
-            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
+            background-color: rgba(255, 255, 255, 0.9);
         }
         .level-card, .shape-card {
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
-            border: 2px solid #f3f4f6;
+            border: 3px solid white;
         }
         .level-card:active, .shape-card:active {
-            transform: scale(0.95);
+            transform: scale(0.92);
         }
         .active-selection {
-            border-color: #fb923c !important;
-            background-color: #fff7ed !important;
+            border-color: #f97316 !important;
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.4);
+            transform: scale(1.05);
         }
         .hidden { display: none !important; }
         
@@ -72,6 +74,16 @@
             border-color: #ef4444 !important;
             background-color: #fef2f2 !important;
         }
+
+        /* Animasi bouncing untuk ikon */
+        .bounce-hover:hover span {
+            display: inline-block;
+            animation: bounce 0.5s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
     </style>
 </head>
 <body>
@@ -80,39 +92,37 @@
     <canvas id="game-canvas"></canvas>
 
     <!-- HALAMAN UTAMA -->
-    <div id="home-view" class="ui-overlay w-full max-w-md ui-panel px-6 rounded-none md:rounded-[40px] shadow-none md:shadow-2xl border-x-4 md:border-8 border-white fade-in flex flex-col h-screen md:h-auto md:max-h-[95dvh] justify-between overflow-hidden">
+    <div id="home-view" class="ui-overlay w-full max-w-md ui-panel px-6 rounded-none md:rounded-[48px] shadow-none md:shadow-2xl border-x-8 md:border-8 border-orange-400 fade-in flex flex-col h-screen md:h-auto md:max-h-[95dvh] justify-between overflow-hidden">
         
         <!-- Header -->
         <div class="text-center pt-12 md:pt-8 pb-2">
-            <h1 class="text-3xl md:text-4xl font-black text-orange-500 tracking-tight leading-tight drop-shadow-sm">🧩 Jigsaw Master</h1>
-            <!-- Mengubah text-gray-400 menjadi text-black dan font-black -->
-            <p class="text-black font-black text-[10px] md:text-xs uppercase tracking-widest leading-none mt-1.5">Petualangan Seru!</p>
+            <h1 class="text-4xl md:text-5xl font-black text-orange-600 tracking-tight leading-tight drop-shadow-md">🧩 Jigsaw Master</h1>
+            <p class="text-blue-600 font-black text-[10px] md:text-xs uppercase tracking-widest leading-none mt-2 bg-blue-50 py-1 rounded-full inline-block px-4">Petualangan Seru Dimulai!</p>
         </div>
 
         <!-- Main Content -->
         <div class="flex-1 flex flex-col justify-evenly py-4 md:py-6 gap-4 overflow-hidden">
             <!-- Data Pemain -->
-            <div id="form-container" class="bg-yellow-50 p-4 rounded-2xl border-2 border-yellow-100 space-y-3 shadow-sm mx-1">
-                <input type="text" id="child-name" placeholder="Siapa Nama Kamu? (Wajib)" class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto text-sm transition-colors">
-                <input type="number" id="child-age" placeholder="Berapa Umur Kamu? (Wajib)" class="w-full px-4 py-2.5 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto text-sm transition-colors">
+            <div id="form-container" class="bg-gradient-to-r from-yellow-100 to-orange-100 p-4 rounded-3xl border-2 border-orange-200 space-y-3 shadow-inner mx-1">
+                <input type="text" id="child-name" placeholder="Siapa Nama Kamu? (Wajib)" class="w-full px-5 py-3 rounded-2xl border-2 border-white focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto text-sm transition-all focus:scale-[1.02]">
+                <input type="number" id="child-age" placeholder="Berapa Umur Kamu? (Wajib)" class="w-full px-5 py-3 rounded-2xl border-2 border-white focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto text-sm transition-all focus:scale-[1.02]">
                 <p id="error-msg" class="text-[10px] text-red-500 font-bold text-center hidden">Wah! Nama dan Umur harus diisi dulu ya! 😊</p>
             </div>
 
             <!-- Pilih Bentuk -->
             <div class="space-y-2">
-                <!-- Mengubah text-gray-400 menjadi text-black -->
-                <p class="text-[10px] font-black text-black uppercase tracking-widest text-center">Pilih Bentuk Puzzle</p>
+                <p class="text-[11px] font-black text-gray-800 uppercase tracking-widest text-center flex items-center justify-center gap-2">✨ PILIH BENTUK PUZZLE ✨</p>
                 <div class="grid grid-cols-4 gap-2 px-1">
-                    <div onclick="setShape('square')" id="shape-square" class="shape-card active-selection p-2.5 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                    <div onclick="setShape('square')" id="shape-square" class="shape-card active-selection p-2.5 rounded-xl bg-blue-100 flex flex-col items-center shadow-md hover:bg-blue-200">
                         <span class="text-2xl">⬛</span>
                     </div>
-                    <div onclick="setShape('circle')" id="shape-circle" class="shape-card p-2.5 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                    <div onclick="setShape('circle')" id="shape-circle" class="shape-card p-2.5 rounded-xl bg-red-100 flex flex-col items-center shadow-md hover:bg-red-200">
                         <span class="text-2xl">🔴</span>
                     </div>
-                    <div onclick="setShape('triangle')" id="shape-triangle" class="shape-card p-2.5 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                    <div onclick="setShape('triangle')" id="shape-triangle" class="shape-card p-2.5 rounded-xl bg-green-100 flex flex-col items-center shadow-md hover:bg-green-200">
                         <span class="text-2xl">🔺</span>
                     </div>
-                    <div onclick="setShape('star')" id="shape-star" class="shape-card p-2.5 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                    <div onclick="setShape('star')" id="shape-star" class="shape-card p-2.5 rounded-xl bg-purple-100 flex flex-col items-center shadow-md hover:bg-purple-200">
                         <span class="text-2xl">⭐</span>
                     </div>
                 </div>
@@ -120,24 +130,23 @@
 
             <!-- Pilih Level -->
             <div class="space-y-2">
-                <!-- Mengubah text-gray-400 menjadi text-black -->
-                <p class="text-[10px] font-black text-black uppercase tracking-widest text-center">Pilih Level Kesulitan</p>
+                <p class="text-[11px] font-black text-gray-800 uppercase tracking-widest text-center flex items-center justify-center gap-2">🚀 PILIH TINGKATAN 🚀</p>
                 <div class="grid grid-cols-2 gap-3 px-1">
-                    <div onclick="startGame(2)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
+                    <div onclick="startGame(2)" class="level-card p-3 rounded-2xl bg-emerald-100 flex flex-col items-center shadow-md hover:bg-emerald-200">
                         <span class="text-xl">🌱</span>
-                        <span class="font-black text-gray-700 text-[11px] mt-0.5">2x2</span>
+                        <span class="font-black text-emerald-700 text-[11px] mt-0.5">2x2 - MUDAH</span>
                     </div>
-                    <div onclick="startGame(3)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
+                    <div onclick="startGame(3)" class="level-card p-3 rounded-2xl bg-sky-100 flex flex-col items-center shadow-md hover:bg-sky-200">
                         <span class="text-xl">🐣</span>
-                        <span class="font-black text-gray-700 text-[11px] mt-0.5">3x3</span>
+                        <span class="font-black text-sky-700 text-[11px] mt-0.5">3x3 - SEDANG</span>
                     </div>
-                    <div onclick="startGame(4)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
+                    <div onclick="startGame(4)" class="level-card p-3 rounded-2xl bg-amber-100 flex flex-col items-center shadow-md hover:bg-amber-200">
                         <span class="text-2xl leading-none">🦁</span>
-                        <span class="font-black text-gray-700 text-[11px] mt-0.5">4x4</span>
+                        <span class="font-black text-amber-700 text-[11px] mt-0.5">4x4 - JAGO</span>
                     </div>
-                    <div onclick="startGame(5)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
+                    <div onclick="startGame(5)" class="level-card p-3 rounded-2xl bg-rose-100 flex flex-col items-center shadow-md hover:bg-rose-200">
                         <span class="text-2xl leading-none">🚀</span>
-                        <span class="font-black text-gray-700 text-[11px] mt-0.5">5x5</span>
+                        <span class="font-black text-rose-700 text-[11px] mt-0.5">5x5 - MASTER</span>
                     </div>
                 </div>
             </div>
@@ -145,8 +154,8 @@
 
         <!-- Footer -->
         <div class="flex flex-col pb-10 md:pb-8 pt-2">
-            <label class="cursor-pointer bg-white text-blue-500 text-center py-4 rounded-3xl text-[11px] font-black border-2 border-blue-100 shadow-sm block pointer-events-auto hover:bg-blue-50 transition-colors">
-                📸 Gunakan Foto Sendiri
+            <label class="cursor-pointer bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-center py-4 rounded-3xl text-sm font-black shadow-lg block pointer-events-auto hover:scale-105 transition-transform active:scale-95">
+                📸 GUNAKAN FOTO SENDIRI
                 <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
             </label>
         </div>
@@ -155,41 +164,42 @@
     <!-- HALAMAN PERMAINAN (UI HUD) -->
     <div id="game-view" class="hidden fixed inset-0 ui-overlay flex flex-col p-4 pointer-events-none">
         <div class="flex justify-between items-start w-full">
-            <button onclick="backToMenu()" class="pointer-events-auto bg-white/90 p-4 rounded-2xl shadow-lg border-2 border-white font-black text-gray-500 flex items-center gap-1 text-2xl">
+            <button onclick="backToMenu()" class="pointer-events-auto bg-white/90 p-4 rounded-2xl shadow-xl border-4 border-blue-400 font-black text-blue-500 flex items-center gap-1 text-2xl hover:scale-110 transition-transform">
                 🏠
             </button>
             <div class="flex gap-2">
-                <div class="bg-white/90 px-5 py-2.5 rounded-2xl shadow-lg border-2 border-white flex items-center gap-2 text-lg">
-                    <span>⏰</span>
-                    <span id="timer" class="font-black text-gray-700">00:00</span>
+                <div class="bg-white/90 px-5 py-2.5 rounded-2xl shadow-xl border-4 border-emerald-400 flex items-center gap-2 text-lg">
+                    <span class="animate-pulse">⏰</span>
+                    <span id="timer" class="font-black text-gray-800">00:00</span>
                 </div>
-                <div class="bg-white/90 px-5 py-2.5 rounded-2xl shadow-lg border-2 border-white flex items-center gap-2 text-lg">
+                <div class="bg-white/90 px-5 py-2.5 rounded-2xl shadow-xl border-4 border-purple-400 flex items-center gap-2 text-lg">
                     <span>🚀</span>
-                    <span id="moves" class="font-black text-gray-700">0</span>
+                    <span id="moves" class="font-black text-gray-800">0</span>
                 </div>
             </div>
         </div>
 
         <div class="flex-1"></div>
 
-        <div class="flex gap-2 w-full pb-4">
-            <button onclick="shufflePieces()" class="pointer-events-auto flex-1 bg-orange-500 text-white py-4 rounded-2xl text-xl font-black shadow-xl">
-                🔄 Acak
+        <div class="flex gap-4 w-full pb-4">
+            <!-- Tombol Acak & Intip lebih berwarna -->
+            <button onclick="shufflePieces()" class="pointer-events-auto flex-1 bg-gradient-to-br from-emerald-400 to-green-600 text-white py-5 rounded-3xl text-xl font-black shadow-2xl hover:scale-105 transition-all active:scale-95 border-b-4 border-green-800">
+                🔄 ACAK
             </button>
-            <button onclick="showPreview()" class="pointer-events-auto flex-1 bg-white/90 text-gray-500 py-4 rounded-2xl text-lg font-black shadow-xl border-2 border-white">
-                👁️ Intip
+            <button onclick="showPreview()" class="pointer-events-auto flex-1 bg-gradient-to-br from-indigo-400 to-blue-600 text-white py-5 rounded-3xl text-xl font-black shadow-2xl hover:scale-105 transition-all active:scale-95 border-b-4 border-blue-800">
+                👁️ INTIP
             </button>
         </div>
 
         <!-- Victory Overlay -->
-        <div id="victory-screen" class="hidden absolute inset-0 bg-white/95 flex flex-col items-center justify-center text-gray-900 rounded-[32px] z-[100] shadow-2xl p-6 border-8 border-green-400 pointer-events-auto m-4 text-center">
-            <div class="text-6xl mb-4 animate-bounce">🎉</div>
-            <h2 class="text-2xl font-black mb-1 text-orange-500">Hebat, <span id="display-name">Jagoan</span>!</h2>
-            <!-- Mengubah text-gray-500 menjadi text-black -->
-            <p class="mb-6 text-base text-black font-bold">Kamu berhasil menyelesaikan tantangan ini! 🌟</p>
-            <div class="flex flex-col gap-3 w-full max-w-[260px]">
-                <button onclick="resetGame()" class="bg-green-500 text-white py-4 rounded-2xl font-black shadow-lg text-lg">Main Lagi! 🔁</button>
-                <button onclick="backToMenu()" class="bg-gray-100 text-gray-600 py-3 rounded-2xl font-black text-xs">Menu Utama</button>
+        <div id="victory-screen" class="hidden absolute inset-0 bg-white/95 flex flex-col items-center justify-center text-gray-900 rounded-[32px] z-[100] shadow-2xl p-6 border-8 border-emerald-400 pointer-events-auto m-4 text-center">
+            <div class="text-7xl mb-4 animate-bounce">🎉</div>
+            <h2 class="text-3xl font-black mb-2 text-orange-600">HEBAT SEKALI!</h2>
+            <h3 class="text-2xl font-black mb-4 text-emerald-600"><span id="display-name">Jagoan</span>!</h3>
+            <p class="mb-8 text-lg text-gray-800 font-bold leading-tight">Kamu berhasil menyelesaikan tantangan ini! 🌟<br>Kamu memang juara!</p>
+            <div class="flex flex-col gap-3 w-full max-w-[280px]">
+                <button onclick="resetGame()" class="bg-gradient-to-r from-emerald-500 to-green-600 text-white py-4 rounded-2xl font-black shadow-xl text-xl hover:scale-105 transition-transform active:scale-95 border-b-4 border-green-800">MAIN LAGI! 🔁</button>
+                <button onclick="backToMenu()" class="bg-gray-100 text-gray-700 py-3 rounded-2xl font-black text-sm hover:bg-gray-200 transition-colors">MENU UTAMA</button>
             </div>
         </div>
     </div>
