@@ -96,7 +96,7 @@
         
         <!-- Header -->
         <div class="text-center pt-12 md:pt-8 pb-2">
-            <!-- md:text-3xl digunakan agar judul tidak terpecah menjadi 2 baris di laptop -->
+            <!-- Saiz md:text-3xl untuk memastikan tajuk kekal 1 baris di komputer riba -->
             <h1 class="text-4xl md:text-3xl font-black text-orange-600 tracking-tight leading-tight drop-shadow-md">🧩 Jigsaw Master</h1>
             <p class="text-blue-600 font-black text-[10px] md:text-xs uppercase tracking-widest leading-none mt-2 bg-blue-50 py-1 rounded-full inline-block px-4">Petualangan Seru Dimulai!</p>
         </div>
@@ -584,19 +584,19 @@
             }
 
             pieces.forEach(p => {
-                ctx.save();
+                ctx.save(); // Simpan keadaan asas untuk kepingan ini
                 if (selectedPiece === p) {
                     ctx.shadowBlur = 40;
                     ctx.shadowColor = "rgba(0,0,0,0.25)";
                     ctx.shadowOffsetY = 10;
                 }
                 
-                // Lukis Jigsaw Path
+                // Lukis Jigsaw Path kepingan
                 drawJigsawPath(ctx, p.x, p.y, pieceSize, p.sides);
                 ctx.clip();
 
-                // Masking dengan Bentuk Utama (Segitiga, Bulat, dll)
-                ctx.save();
+                // Masking dengan Bentuk Utama (Segitiga, Bulat, dll) secara relatif kepada kepingan
+                ctx.save(); // Simpan untuk masking imej
                 const dx = p.x - p.correctX;
                 const dy = p.y - p.correctY;
                 ctx.translate(dx, dy);
@@ -605,8 +605,9 @@
                 
                 ctx.drawImage(img, p.sx - p.srcStep * 0.3, p.sy - p.srcStep * 0.3, p.srcStep * 1.6, p.srcStep * 1.6, 
                               p.x - pieceSize * 0.3, p.y - pieceSize * 0.3, pieceSize * 1.6, pieceSize * 1.6);
-                ctx.restore();
-                ctx.restore();
+                
+                ctx.restore(); // Lepaskan mask imej/translate
+                ctx.restore(); // Lepaskan klip kepingan/bayangan
             });
             
             requestAnimationFrame(draw);
