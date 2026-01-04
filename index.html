@@ -96,7 +96,7 @@
         
         <!-- Header -->
         <div class="text-center pt-12 md:pt-8 pb-2">
-            <!-- Saiz md:text-2xl untuk memastikan tajuk kekal 1 baris di komputer riba -->
+            <!-- md:text-2xl untuk laptop agar tidak terbelah 2 baris -->
             <h1 class="text-4xl md:text-2xl font-black text-orange-600 tracking-tight leading-tight drop-shadow-md">🧩 Jigsaw Master</h1>
             <p class="text-blue-600 font-black text-[10px] md:text-xs uppercase tracking-widest leading-none mt-2 bg-blue-50 py-1 rounded-full inline-block px-4">Petualangan Seru Dimulai!</p>
         </div>
@@ -558,7 +558,8 @@
                 if (elapsed > 0 && elapsed % 60 === 0 && elapsed !== lastEncouragementTime && !isWin) {
                     lastEncouragementTime = elapsed;
                     const name = nameInput.value.trim() || "Jagoan";
-                    speak(`Say in a whisper: Ayo ${name}, semangat terus! Kamu pasti bisa menyelesaikan puzzlenya!`);
+                    // Menggunakan bahasa yang lebih alami/manusiawi
+                    speak(`Katakan dengan suara penyemangat: Ayo ${name}, semangat terus! Kamu hebat sekali, ayo selesaikan puzzlenya!`);
                 }
             }, 1000);
         }
@@ -617,8 +618,8 @@
                     displayName.innerText = name;
                     sounds.victory();
                     
-                    // Suara penyemangat sukses
-                    speak(`Say cheerfully: Wah, hebat sekali ${name}! Kamu berhasil menyusun puzzlenya. Kamu memang juara!`, 500);
+                    // Suara penyemangat sukses yang lebih alami/manusiawi
+                    speak(`Katakan dengan suara sangat gembira: Wah, hebat sekali ${name}! Kamu berhasil menyusun puzzlenya. Kamu memang juara yang luar biasa!`, 500);
 
                     setTimeout(() => {
                         victoryScreen.classList.remove('hidden');
