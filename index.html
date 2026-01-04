@@ -27,7 +27,7 @@
             width: 100%;
             height: 100%;
             z-index: 20; 
-            pointer-events: none; /* Klik tembus ke UI di bawah jika tidak kena kepingan */
+            pointer-events: none; 
         }
         /* UI Overlay berada di bawah kepingan puzzle (z-index 10) */
         .ui-overlay {
@@ -59,6 +59,11 @@
             to { opacity: 1; transform: translateY(0); }
         }
         input, button { pointer-events: auto; }
+
+        /* Sembunyikan scrollbar untuk pengalaman layar penuh */
+        ::-webkit-scrollbar {
+            display: none;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center">
@@ -72,71 +77,72 @@
     </button>
 
     <!-- HALAMAN UTAMA -->
-    <!-- h-full dan rounded-none digunakan untuk menghilangkan batas atas/bawah -->
-    <div id="home-view" class="ui-overlay w-full max-w-sm ui-panel p-6 rounded-none shadow-none border-x-4 border-white fade-in flex flex-col h-full">
-        <div class="text-center mb-6 pt-4">
-            <h1 class="text-3xl font-black text-orange-500 tracking-tight">🧩 Jigsaw Master</h1>
-            <p class="text-gray-400 font-bold text-[10px] uppercase tracking-widest leading-none mt-1">Petualangan Seru!</p>
+    <!-- h-screen dan rounded-none memastikan panel menempel dari atas ke bawah -->
+    <div id="home-view" class="ui-overlay w-full max-w-sm ui-panel px-6 py-2 rounded-none shadow-none border-x-4 border-white fade-in flex flex-col h-screen justify-between">
+        
+        <div class="text-center pt-4">
+            <h1 class="text-2xl font-black text-orange-500 tracking-tight leading-tight">🧩 Jigsaw Master</h1>
+            <p class="text-gray-400 font-bold text-[9px] uppercase tracking-widest leading-none mt-0.5">Petualangan Seru!</p>
         </div>
 
-        <div class="space-y-4 mb-6 flex-1 overflow-y-auto pr-1">
+        <div class="flex-1 flex flex-col justify-center space-y-3 overflow-hidden">
             <!-- Data Pemain -->
-            <div class="bg-yellow-50 p-4 rounded-2xl border-2 border-yellow-100 space-y-3">
-                <div class="flex flex-col gap-1">
-                    <label class="text-[9px] font-black text-orange-400 uppercase tracking-tighter ml-1">Siapa Nama Kamu?</label>
-                    <input type="text" id="child-name" placeholder="Tulis di sini..." class="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto text-sm">
+            <div class="bg-yellow-50 p-3 rounded-2xl border-2 border-yellow-100 space-y-2">
+                <div class="flex flex-col gap-0.5">
+                    <label class="text-[8px] font-black text-orange-400 uppercase tracking-tighter ml-1">Siapa Nama Kamu?</label>
+                    <input type="text" id="child-name" placeholder="Tulis di sini..." class="w-full px-3 py-1.5 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto text-xs">
                 </div>
-                <div class="flex flex-col gap-1">
-                    <label class="text-[9px] font-black text-orange-400 uppercase tracking-tighter ml-1">Berapa Umur Kamu?</label>
-                    <input type="number" id="child-age" placeholder="Angka umur..." class="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto text-sm">
+                <div class="flex flex-col gap-0.5">
+                    <label class="text-[8px] font-black text-orange-400 uppercase tracking-tighter ml-1">Berapa Umur Kamu?</label>
+                    <input type="number" id="child-age" placeholder="Angka umur..." class="w-full px-3 py-1.5 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto text-xs">
                 </div>
             </div>
 
             <!-- Pilih Bentuk -->
-            <div class="space-y-2">
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Bentuk Puzzle</p>
-                <div class="grid grid-cols-4 gap-2 px-2">
-                    <div onclick="setShape('square')" id="shape-square" class="shape-card active-selection p-3 rounded-xl bg-white flex flex-col items-center shadow-sm">
-                        <span class="text-2xl">⬛</span>
+            <div class="space-y-1">
+                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest text-center">Pilih Bentuk Puzzle</p>
+                <div class="grid grid-cols-4 gap-1.5 px-1">
+                    <div onclick="setShape('square')" id="shape-square" class="shape-card active-selection p-1.5 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-xl">⬛</span>
                     </div>
-                    <div onclick="setShape('circle')" id="shape-circle" class="shape-card p-3 rounded-xl bg-white flex flex-col items-center shadow-sm">
-                        <span class="text-2xl">🔴</span>
+                    <div onclick="setShape('circle')" id="shape-circle" class="shape-card p-1.5 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-xl">🔴</span>
                     </div>
-                    <div onclick="setShape('triangle')" id="shape-triangle" class="shape-card p-3 rounded-xl bg-white flex flex-col items-center shadow-sm">
-                        <span class="text-2xl">🔺</span>
+                    <div onclick="setShape('triangle')" id="shape-triangle" class="shape-card p-1.5 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-xl">🔺</span>
                     </div>
-                    <div onclick="setShape('star')" id="shape-star" class="shape-card p-3 rounded-xl bg-white flex flex-col items-center shadow-sm">
-                        <span class="text-2xl">⭐</span>
+                    <div onclick="setShape('star')" id="shape-star" class="shape-card p-1.5 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-xl">⭐</span>
                     </div>
                 </div>
             </div>
 
             <!-- Pilih Level -->
-            <div class="space-y-2">
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Pilih Level</p>
-                <div class="grid grid-cols-2 gap-3 px-2">
-                    <div onclick="startGame(2)" class="level-card p-4 rounded-2xl bg-white flex flex-col items-center shadow-sm">
-                        <span class="text-2xl">🌱</span>
-                        <span class="font-black text-gray-700 text-xs mt-1">2x2</span>
+            <div class="space-y-1">
+                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest text-center">Pilih Level</p>
+                <div class="grid grid-cols-2 gap-2 px-1">
+                    <div onclick="startGame(2)" class="level-card p-2 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-xl">🌱</span>
+                        <span class="font-black text-gray-700 text-[9px] mt-0.5">2x2</span>
                     </div>
-                    <div onclick="startGame(3)" class="level-card p-4 rounded-2xl bg-white flex flex-col items-center shadow-sm">
-                        <span class="text-2xl">🐣</span>
-                        <span class="font-black text-gray-700 text-xs mt-1">3x3</span>
+                    <div onclick="startGame(3)" class="level-card p-2 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-xl">🐣</span>
+                        <span class="font-black text-gray-700 text-[9px] mt-0.5">3x3</span>
                     </div>
-                    <div onclick="startGame(4)" class="level-card p-4 rounded-2xl bg-white flex flex-col items-center shadow-sm">
-                        <span class="text-3xl leading-none">🦁</span>
-                        <span class="font-black text-gray-700 text-xs mt-1">4x4</span>
+                    <div onclick="startGame(4)" class="level-card p-2 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-2xl leading-none">🦁</span>
+                        <span class="font-black text-gray-700 text-[9px] mt-0.5">4x4</span>
                     </div>
-                    <div onclick="startGame(5)" class="level-card p-4 rounded-2xl bg-white flex flex-col items-center shadow-sm">
-                        <span class="text-3xl leading-none">🚀</span>
-                        <span class="font-black text-gray-700 text-xs mt-1">5x5</span>
+                    <div onclick="startGame(5)" class="level-card p-2 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-2xl leading-none">🚀</span>
+                        <span class="font-black text-gray-700 text-[9px] mt-0.5">5x5</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="flex flex-col pb-8">
-            <label class="cursor-pointer bg-white text-blue-500 text-center py-4 rounded-2xl text-xs font-black border-2 border-blue-100 shadow-sm block pointer-events-auto hover:bg-blue-50 transition-colors">
+        <div class="flex flex-col pb-6">
+            <label class="cursor-pointer bg-white text-blue-500 text-center py-3 rounded-2xl text-[10px] font-black border-2 border-blue-100 shadow-sm block pointer-events-auto hover:bg-blue-50 transition-colors">
                 📸 Gunakan Foto Sendiri
                 <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
             </label>
@@ -146,7 +152,7 @@
     <!-- HALAMAN PERMAINAN (UI HUD) -->
     <div id="game-view" class="hidden fixed inset-0 ui-overlay flex flex-col p-3 pointer-events-none">
         <div class="flex justify-between items-start w-full">
-            <button onclick="backToMenu()" class="pointer-events-auto bg-white/90 p-2.5 rounded-xl shadow-lg border-2 border-white font-black text-gray-500 flex items-center gap-1 text-sm">
+            <button onclick="backToMenu()" class="pointer-events-auto bg-white/90 p-2 rounded-xl shadow-lg border-2 border-white font-black text-gray-500 flex items-center gap-1 text-sm">
                 🏠
             </button>
             <div class="flex gap-1.5">
@@ -255,26 +261,15 @@
             img.src = currentImageUrl;
 
             window.addEventListener('resize', setupDimensions);
-            
-            // Interaksi ditangkap di window agar bisa deteksi kepingan maupun UI
             window.addEventListener('mousedown', onPointerDown);
             window.addEventListener('mousemove', onPointerMove);
             window.addEventListener('mouseup', onPointerUp);
-            
             window.addEventListener('touchstart', (e) => { 
-                // Cek kepingan dulu
-                if (onPointerDown(e.touches[0])) {
-                    e.preventDefault(); // Hanya cegah default jika kena kepingan
-                }
+                if (onPointerDown(e.touches[0])) e.preventDefault();
             }, { passive: false });
-            
             window.addEventListener('touchmove', (e) => { 
-                if (selectedPiece) {
-                    e.preventDefault();
-                    onPointerMove(e.touches[0]);
-                }
+                if (selectedPiece) { e.preventDefault(); onPointerMove(e.touches[0]); }
             }, { passive: false });
-            
             window.addEventListener('touchend', onPointerUp);
         }
 
@@ -294,7 +289,7 @@
             gridSize = level;
             homeView.classList.add('hidden');
             gameView.classList.remove('hidden');
-            canvas.classList.remove('hidden'); // Pastikan canvas muncul saat mulai
+            canvas.classList.remove('hidden');
             setupDimensions();
             resetGame();
         }
@@ -304,7 +299,7 @@
             clearInterval(timerInterval);
             gameView.classList.add('hidden');
             homeView.classList.remove('hidden');
-            canvas.classList.remove('hidden'); // Munculkan kembali canvas jika sebelumnya menang
+            canvas.classList.remove('hidden');
             isWin = false;
             victoryScreen.classList.add('hidden');
         }
@@ -427,7 +422,7 @@
             moves = 0;
             movesDisplay.innerText = moves;
             victoryScreen.classList.add('hidden');
-            canvas.classList.remove('hidden'); // Munculkan kembali canvas jika acak ulang setelah menang
+            canvas.classList.remove('hidden');
             pieces.forEach(p => {
                 p.x = Math.random() * (canvas.width - pieceSize);
                 p.y = Math.random() * (canvas.height - pieceSize);
@@ -455,10 +450,8 @@
 
         function onPointerDown(e) {
             if (isWin) return false;
-            
             const mouseX = e.clientX;
             const mouseY = e.clientY;
-
             let foundIndex = -1;
             for (let i = pieces.length - 1; i >= 0; i--) {
                 const p = pieces[i];
@@ -467,7 +460,6 @@
                     break;
                 }
             }
-
             if (foundIndex !== -1) {
                 sounds.pickup();
                 selectedPiece = pieces[foundIndex];
@@ -477,7 +469,6 @@
                 selectedPiece.offsetY = mouseY - selectedPiece.y;
                 return true; 
             }
-            
             return false; 
         }
 
@@ -501,7 +492,6 @@
                     clearInterval(timerInterval);
                     displayName.innerText = nameInput.value.trim() || "Jagoan";
                     sounds.victory();
-                    // FIX: Sembunyikan canvas tepat saat layar kemenangan muncul
                     setTimeout(() => {
                         victoryScreen.classList.remove('hidden');
                         canvas.classList.add('hidden'); 
@@ -515,9 +505,7 @@
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
             if (!gameView.classList.contains('hidden')) {
-                // Area target
                 ctx.save();
                 defineShapePath(ctx, targetX, targetY, targetSize, currentShape);
                 ctx.fillStyle = "rgba(0,0,0,0.03)";
@@ -526,7 +514,6 @@
                 ctx.lineWidth = 2;
                 ctx.stroke();
                 ctx.restore();
-
                 if (showFullImage) {
                     ctx.save();
                     defineShapePath(ctx, targetX, targetY, targetSize, currentShape);
@@ -536,8 +523,6 @@
                     ctx.drawImage(img, (img.width - minDim)/2, (img.height - minDim)/2, minDim, minDim, targetX, targetY, targetSize, targetSize);
                     ctx.restore();
                 }
-
-                // Grid bantu
                 ctx.save();
                 defineShapePath(ctx, targetX, targetY, targetSize, currentShape);
                 ctx.clip();
@@ -551,7 +536,6 @@
                 });
                 ctx.restore();
             }
-
             pieces.forEach(p => {
                 ctx.save();
                 if (selectedPiece === p) {
@@ -572,7 +556,6 @@
                               p.x - pieceSize * 0.3, p.y - pieceSize * 0.3, pieceSize * 1.6, pieceSize * 1.6);
                 ctx.restore();
             });
-            
             requestAnimationFrame(draw);
         }
 
