@@ -2,165 +2,153 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Jigsaw Master Cilik</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        :root {
+            --safe-top: env(safe-area-inset-top);
+            --safe-bottom: env(safe-area-inset-bottom);
+        }
         body {
             background-color: #fef9c3;
             touch-action: none;
             user-select: none;
             font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
+            overflow: hidden; /* Paksa tidak ada scroll */
+            width: 100vw;
+            height: 100dvh;
         }
         #game-canvas {
-            cursor: grab;
-            max-width: 100%;
-            height: auto;
-            background-color: #ffffff;
-            border-radius: 24px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            border: 8px solid white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
         }
-        #game-canvas:active {
-            cursor: grabbing;
+        .ui-overlay {
+            position: relative;
+            z-index: 10;
+            pointer-events: none; /* Klik bisa tembus ke canvas */
+        }
+        .ui-overlay button, .ui-overlay input, .ui-overlay .level-card {
+            pointer-events: auto; /* Kecuali elemen interaktif */
         }
         .ui-panel {
             backdrop-filter: blur(12px);
-            background-color: rgba(255, 255, 255, 0.95);
+            background-color: rgba(255, 255, 255, 0.9);
         }
         .level-card {
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
-            border: 3px solid #f3f4f6;
+            border: 2px solid #f3f4f6;
         }
-        .level-card:hover {
-            transform: scale(1.05);
-            border-color: #fbbf24;
+        .level-card:active {
+            transform: scale(0.95);
         }
         .hidden { display: none !important; }
         
-        /* Animasi Transisi */
-        .fade-in { animation: fadeIn 0.5s ease-out; }
+        /* Animasi */
+        .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="flex items-center justify-center">
 
-    <!-- HALAMAN UTAMA (Main Menu) -->
-    <div id="home-view" class="w-full max-w-2xl ui-panel p-8 md:p-12 rounded-[48px] shadow-2xl border-4 border-white fade-in">
-        <div class="text-center mb-10">
-            <h1 class="text-5xl md:text-6xl font-black text-orange-500 mb-4 tracking-tight drop-shadow-sm">🧩 Jigsaw Master</h1>
-            <p class="text-gray-500 font-bold uppercase tracking-widest text-sm">Petualangan Puzzle Seru!</p>
+    <!-- CANVAS LAYAR PENUH (Background & Gameplay Area) -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- AUDIO TOGGLE -->
+    <button id="sound-toggle" onclick="toggleSound()" class="fixed top-4 right-4 z-50 bg-white p-3 rounded-full shadow-lg border-2 border-gray-100 hover:scale-110 transition-transform ui-overlay pointer-events-auto">
+        <span id="sound-icon" class="text-xl">🔊</span>
+    </button>
+
+    <!-- HALAMAN UTAMA -->
+    <div id="home-view" class="ui-overlay pointer-events-auto w-[90%] max-w-md ui-panel p-6 rounded-[40px] shadow-2xl border-4 border-white fade-in flex flex-col max-h-[90dvh]">
+        <div class="text-center mb-4">
+            <h1 class="text-3xl font-black text-orange-500 tracking-tight">🧩 Jigsaw Master</h1>
+            <p class="text-gray-400 font-bold text-[10px] uppercase tracking-widest">Petualangan Seru!</p>
         </div>
 
-        <!-- Data Pemain -->
-        <div class="space-y-6 mb-10">
-            <div class="bg-yellow-50 p-6 rounded-3xl border-2 border-yellow-100">
-                <h3 class="text-center font-black text-orange-400 text-xs uppercase tracking-widest mb-4">Siapa Jagoan Hari Ini?</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <input type="text" id="child-name" placeholder="Nama Kamu" class="md:col-span-2 px-6 py-4 rounded-2xl border-2 border-gray-100 focus:border-orange-400 focus:ring-0 outline-none transition-all font-bold text-gray-700 text-lg shadow-sm">
-                    <input type="number" id="child-age" placeholder="Umur" class="px-6 py-4 rounded-2xl border-2 border-gray-100 focus:border-orange-400 focus:ring-0 outline-none transition-all font-bold text-gray-700 text-lg shadow-sm">
+        <div class="space-y-3 mb-4 overflow-y-auto pr-1">
+            <div class="bg-yellow-50 p-4 rounded-2xl border-2 border-yellow-100 space-y-3">
+                <input type="text" id="child-name" placeholder="Nama Kamu" class="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm">
+                <input type="number" id="child-age" placeholder="Umur" class="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm">
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div onclick="startGame(2)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
+                    <span class="text-2xl">🌱</span>
+                    <span class="font-black text-gray-700 text-xs">2x2</span>
+                </div>
+                <div onclick="startGame(3)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
+                    <span class="text-2xl">🐣</span>
+                    <span class="font-black text-gray-700 text-xs">3x3</span>
+                </div>
+                <div onclick="startGame(4)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm border-orange-200">
+                    <span class="text-2xl">🦁</span>
+                    <span class="font-black text-gray-700 text-xs">4x4</span>
+                </div>
+                <div onclick="startGame(5)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
+                    <span class="text-2xl">🚀</span>
+                    <span class="font-black text-gray-700 text-xs">5x5</span>
                 </div>
             </div>
         </div>
 
-        <!-- Pilihan Level -->
-        <div class="space-y-4">
-            <h3 class="text-center font-black text-gray-400 text-xs uppercase tracking-widest mb-4">Pilih Level Untuk Mulai:</h3>
-            <div id="difficulty-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                <div onclick="startGame(2)" class="level-card p-5 rounded-3xl bg-white flex flex-col items-center gap-1 shadow-sm">
-                    <span class="text-3xl mb-1">🌱</span>
-                    <span class="font-black text-gray-700">Mudah Sekali</span>
-                    <span class="text-gray-300 text-[10px]">★☆☆☆☆</span>
-                </div>
-                <div onclick="startGame(3)" class="level-card p-5 rounded-3xl bg-white flex flex-col items-center gap-1 shadow-sm">
-                    <span class="text-3xl mb-1">🐣</span>
-                    <span class="font-black text-gray-700">Mudah</span>
-                    <span class="text-gray-300 text-[10px]">★★☆☆☆</span>
-                </div>
-                <div onclick="startGame(4)" class="level-card p-5 rounded-3xl bg-white flex flex-col items-center gap-1 shadow-sm">
-                    <span class="text-3xl mb-1">🦁</span>
-                    <span class="font-black text-gray-700">Bisa!</span>
-                    <span class="text-gray-300 text-[10px]">★★★☆☆</span>
-                </div>
-                <div onclick="startGame(5)" class="level-card p-5 rounded-3xl bg-white flex flex-col items-center gap-1 shadow-sm">
-                    <span class="text-3xl mb-1">🚀</span>
-                    <span class="font-black text-gray-700">Jagoan</span>
-                    <span class="text-gray-300 text-[10px]">★★★★☆</span>
-                </div>
-                <div onclick="startGame(6)" class="level-card p-5 rounded-3xl bg-white flex flex-col items-center gap-1 shadow-sm">
-                    <span class="text-3xl mb-1">🦅</span>
-                    <span class="font-black text-gray-700">Hebat</span>
-                    <span class="text-gray-300 text-[10px]">★★★★★</span>
-                </div>
-                <div onclick="startGame(8)" class="level-card p-5 rounded-3xl bg-white flex flex-col items-center gap-1 shadow-sm">
-                    <span class="text-3xl mb-1">👑</span>
-                    <span class="font-black text-gray-700">Master</span>
-                    <span class="text-gray-300 text-[10px]">★★★★★★</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="mt-10 flex justify-center">
-            <label class="cursor-pointer bg-white text-blue-500 hover:bg-blue-50 px-8 py-4 rounded-3xl text-sm font-black transition-all flex items-center gap-2 border-2 border-blue-100 shadow-sm">
+        <div class="flex flex-col gap-2">
+            <label class="cursor-pointer bg-white text-blue-500 text-center py-3 rounded-2xl text-xs font-black border-2 border-blue-100 shadow-sm block">
                 📸 Pilih Foto Sendiri
                 <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
             </label>
         </div>
     </div>
 
-    <!-- HALAMAN PERMAINAN (Game View) -->
-    <div id="game-view" class="hidden flex flex-col items-center w-full fade-in">
-        
-        <!-- Stats Header -->
-        <div class="mb-6 flex gap-4 w-full max-w-2xl">
-            <button onclick="backToMenu()" class="bg-white p-4 rounded-3xl shadow-sm border-2 border-gray-100 hover:bg-gray-50 transition-all font-black text-gray-500 flex items-center gap-2">
-                🏠 Menu
+    <!-- HALAMAN PERMAINAN (UI HUD) -->
+    <div id="game-view" class="hidden fixed inset-0 ui-overlay flex flex-col p-4 pointer-events-none">
+        <!-- Header HUD -->
+        <div class="flex justify-between items-start w-full">
+            <button onclick="backToMenu()" class="pointer-events-auto bg-white/90 p-3 rounded-2xl shadow-lg border-2 border-white font-black text-gray-500 flex items-center gap-2">
+                🏠
             </button>
-            <div class="flex-1 flex gap-4 justify-center">
-                <div class="bg-white px-6 py-4 rounded-3xl shadow-sm border-2 border-white flex items-center gap-3">
-                    <span class="text-2xl">⏰</span>
-                    <span id="timer" class="font-black text-gray-700 text-xl">00:00</span>
+            <div class="flex gap-2">
+                <div class="bg-white/90 px-4 py-2 rounded-2xl shadow-lg border-2 border-white flex items-center gap-2">
+                    <span>⏰</span>
+                    <span id="timer" class="font-black text-gray-700">00:00</span>
                 </div>
-                <div class="bg-white px-6 py-4 rounded-3xl shadow-sm border-2 border-white flex items-center gap-3">
-                    <span class="text-2xl">🚀</span>
-                    <span id="moves" class="font-black text-gray-700 text-xl">0</span>
+                <div class="bg-white/90 px-4 py-2 rounded-2xl shadow-lg border-2 border-white flex items-center gap-2">
+                    <span>🚀</span>
+                    <span id="moves" class="font-black text-gray-700">0</span>
                 </div>
             </div>
         </div>
 
-        <!-- Canvas Container -->
-        <div class="relative">
-            <canvas id="game-canvas"></canvas>
-            
-            <!-- Victory Screen -->
-            <div id="victory-screen" class="hidden absolute inset-0 bg-white/95 flex flex-col items-center justify-center text-gray-900 rounded-[32px] z-20 shadow-2xl animate-in zoom-in duration-300 p-8 border-8 border-green-400">
-                <div class="text-8xl mb-4 animate-bounce">🎉</div>
-                <h2 class="text-4xl font-black mb-2 text-center text-orange-500">Hebat Sekali, <span id="display-name">Jagoan</span>!</h2>
-                <p class="mb-8 text-gray-500 font-bold text-xl text-center">Kamu berhasil menyelesaikan puzzle ini! 🌟</p>
-                <div class="flex gap-4">
-                    <button onclick="backToMenu()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-5 rounded-full text-xl font-black transition-all shadow-md">
-                        Menu Utama
-                    </button>
-                    <button onclick="resetGame()" class="bg-green-500 hover:bg-green-600 text-white px-10 py-5 rounded-full text-xl font-black transition-all transform hover:scale-105 shadow-xl">
-                        Main Lagi! 🔁
-                    </button>
-                </div>
-            </div>
-        </div>
+        <!-- Spacer tengah -->
+        <div class="flex-1"></div>
 
-        <!-- Action Buttons -->
-        <div class="mt-8 flex gap-4 items-center justify-center w-full max-w-2xl">
-            <button onclick="shufflePieces()" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-8 py-5 rounded-[32px] text-lg font-black transition-all shadow-lg flex items-center justify-center gap-3">
-                🔄 Acak Lagi
+        <!-- Footer HUD -->
+        <div class="flex gap-3 w-full pb-4">
+            <button onclick="shufflePieces()" class="pointer-events-auto flex-1 bg-orange-500 text-white py-4 rounded-3xl text-sm font-black shadow-xl">
+                🔄 Acak
             </button>
-            <button onclick="showPreview()" class="flex-1 bg-white border-4 border-white hover:bg-gray-50 text-gray-500 px-8 py-5 rounded-[32px] text-lg font-black transition-all shadow-md flex items-center justify-center gap-3">
+            <button onclick="showPreview()" class="pointer-events-auto flex-1 bg-white/90 text-gray-500 py-4 rounded-3xl text-sm font-black shadow-xl border-2 border-white">
                 👁️ Intip
             </button>
+        </div>
+
+        <!-- Victory Overlay -->
+        <div id="victory-screen" class="hidden absolute inset-0 bg-white/95 flex flex-col items-center justify-center text-gray-900 rounded-[32px] z-20 shadow-2xl p-8 border-8 border-green-400 pointer-events-auto m-6">
+            <div class="text-6xl mb-4 animate-bounce">🎉</div>
+            <h2 class="text-2xl font-black mb-1 text-center text-orange-500">Hebat, <span id="display-name">Jagoan</span>!</h2>
+            <p class="mb-6 text-gray-500 font-bold text-center">Kamu berhasil! 🌟</p>
+            <div class="flex flex-col gap-2 w-full">
+                <button onclick="resetGame()" class="bg-green-500 text-white py-4 rounded-2xl font-black shadow-lg">Main Lagi! 🔁</button>
+                <button onclick="backToMenu()" class="bg-gray-100 text-gray-600 py-3 rounded-2xl font-black">Menu Utama</button>
+            </div>
         </div>
     </div>
 
@@ -172,7 +160,7 @@
         const victoryScreen = document.getElementById('victory-screen');
         const nameInput = document.getElementById('child-name');
         const displayName = document.getElementById('display-name');
-        
+        const soundIcon = document.getElementById('sound-icon');
         const homeView = document.getElementById('home-view');
         const gameView = document.getElementById('game-view');
 
@@ -180,42 +168,89 @@
         let pieces = [];
         let selectedPiece = null;
         let gridSize = 4;
-        let pieceSize;
+        let pieceSize, targetSize, targetX, targetY;
         let moves = 0;
         let startTime;
         let timerInterval;
         let isWin = false;
         let showFullImage = false;
+        let soundEnabled = true;
 
         let currentImageUrl = 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=1200&q=80';
 
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playTone(freq, type, duration, volume = 0.05) {
+            if (!soundEnabled) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        const sounds = {
+            click: () => playTone(600, 'sine', 0.1),
+            pickup: () => playTone(450, 'sine', 0.1),
+            drop: () => playTone(300, 'sine', 0.1),
+            snap: () => { playTone(523, 'sine', 0.15); setTimeout(() => playTone(659, 'sine', 0.15), 80); },
+            victory: () => { [523, 659, 783, 1046].forEach((f, i) => setTimeout(() => playTone(f, 'sine', 0.4), i * 150)); }
+        };
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            soundIcon.innerText = soundEnabled ? '🔊' : '🔇';
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
         function init() {
-            img.onload = () => {
-                // Gambar dimuat di background
-                animate();
+            img.onload = () => { 
+                animate(); 
             };
             img.src = currentImageUrl;
 
+            window.addEventListener('resize', setupDimensions);
             canvas.addEventListener('mousedown', onPointerDown);
-            canvas.addEventListener('mousemove', onPointerMove);
+            window.addEventListener('mousemove', onPointerMove);
             window.addEventListener('mouseup', onPointerUp);
             canvas.addEventListener('touchstart', (e) => { e.preventDefault(); onPointerDown(e.touches[0]); }, { passive: false });
-            canvas.addEventListener('touchmove', (e) => { e.preventDefault(); onPointerMove(e.touches[0]); }, { passive: false });
+            window.addEventListener('touchmove', (e) => { onPointerMove(e.touches[0]); }, { passive: false });
             window.addEventListener('touchend', onPointerUp);
         }
 
+        function setupDimensions() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            targetSize = Math.min(canvas.width * 0.85, canvas.height * 0.5);
+            targetX = (canvas.width - targetSize) / 2;
+            targetY = (canvas.height - targetSize) / 2;
+            pieceSize = targetSize / gridSize;
+            
+            if(pieces.length > 0) {
+                updatePiecesCoordinates();
+            }
+        }
+
         function startGame(level) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            sounds.click();
             gridSize = level;
             homeView.classList.add('hidden');
             gameView.classList.remove('hidden');
-            
-            // Berikan sedikit jeda untuk memastikan layout siap
-            setTimeout(() => {
-                resetGame();
-            }, 50);
+            setupDimensions();
+            resetGame();
         }
 
         function backToMenu() {
+            sounds.click();
             clearInterval(timerInterval);
             gameView.classList.add('hidden');
             homeView.classList.remove('hidden');
@@ -223,21 +258,14 @@
             victoryScreen.classList.add('hidden');
         }
 
-        function setupCanvas() {
-            const size = Math.min(window.innerWidth - 60, 600);
-            canvas.width = size;
-            canvas.height = size;
-            pieceSize = canvas.width / gridSize;
-        }
-
         function handleImageUpload(event) {
             const file = event.target.files[0];
             if (file) {
+                sounds.click();
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     currentImageUrl = e.target.result;
                     img.src = currentImageUrl;
-                    // Tetap di menu utama agar pemain bisa pilih level setelah ganti gambar
                 };
                 reader.readAsDataURL(file);
             }
@@ -266,11 +294,10 @@
                     pieces.push({
                         sx: sourceStartX + x * sourceStep,
                         sy: sourceStartY + y * sourceStep,
-                        sourceSquareSize: sourceStep,
-                        correctX: x * pieceSize,
-                        correctY: y * pieceSize,
-                        x: x * pieceSize,
-                        y: y * pieceSize,
+                        srcStep: sourceStep,
+                        gridX: x,
+                        gridY: y,
+                        x: 0, y: 0,
                         isSolved: false,
                         sides: {
                             top: -hSides[y][x],
@@ -281,6 +308,18 @@
                     });
                 }
             }
+            updatePiecesCoordinates();
+        }
+
+        function updatePiecesCoordinates() {
+            pieces.forEach(p => {
+                p.correctX = targetX + p.gridX * pieceSize;
+                p.correctY = targetY + p.gridY * pieceSize;
+                if(p.isSolved) {
+                    p.x = p.correctX;
+                    p.y = p.correctY;
+                }
+            });
         }
 
         function drawJigsawPath(context, x, y, size, sides) {
@@ -288,7 +327,6 @@
             const neck = 0.12;
             context.beginPath();
             context.moveTo(x, y);
-
             if (sides.top !== 0) {
                 const s = sides.top;
                 context.lineTo(x + size * (0.5 - neck), y);
@@ -296,7 +334,6 @@
                 context.bezierCurveTo(x + size * 0.8, y - tabSize * 0.9 * s, x + size * (0.5 + neck), y - tabSize * 0.1 * s, x + size * (0.5 + neck), y);
             }
             context.lineTo(x + size, y);
-
             if (sides.right !== 0) {
                 const s = sides.right;
                 context.lineTo(x + size, y + size * (0.5 - neck));
@@ -304,7 +341,6 @@
                 context.bezierCurveTo(x + size + tabSize * 0.9 * s, y + size * 0.8, x + size + tabSize * 0.1 * s, y + size * (0.5 + neck), x + size, y + size * (0.5 + neck));
             }
             context.lineTo(x + size, y + size);
-
             if (sides.bottom !== 0) {
                 const s = sides.bottom;
                 context.lineTo(x + size * (0.5 + neck), y + size);
@@ -312,7 +348,6 @@
                 context.bezierCurveTo(x + size * 0.2, y + size + tabSize * 0.9 * s, x + size * (0.5 - neck), y + size + tabSize * 0.1 * s, x + size * (0.5 - neck), y + size);
             }
             context.lineTo(x, y + size);
-
             if (sides.left !== 0) {
                 const s = sides.left;
                 context.lineTo(x, y + size * (0.5 + neck));
@@ -323,13 +358,14 @@
         }
 
         function shufflePieces() {
+            sounds.click();
             isWin = false;
             moves = 0;
             movesDisplay.innerText = moves;
             victoryScreen.classList.add('hidden');
             pieces.forEach(p => {
-                p.x = 20 + Math.random() * (canvas.width - pieceSize - 40);
-                p.y = 20 + Math.random() * (canvas.height - pieceSize - 40);
+                p.x = Math.random() * (canvas.width - pieceSize);
+                p.y = Math.random() * (canvas.height - pieceSize);
                 p.isSolved = false;
             });
             startTimer();
@@ -340,32 +376,30 @@
             startTime = Date.now();
             timerInterval = setInterval(() => {
                 const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
-                const secs = (elapsed % 60).toString().padStart(2, '0');
-                timerDisplay.innerText = `${mins}:${secs}`;
+                timerDisplay.innerText = `${Math.floor(elapsed/60).toString().padStart(2, '0')}:${(elapsed%60).toString().padStart(2, '0')}`;
             }, 1000);
         }
 
         function resetGame() {
-            setupCanvas();
             createPieces();
             shufflePieces();
         }
 
         function showPreview() {
+            sounds.click();
             showFullImage = true;
             setTimeout(() => { showFullImage = false; }, 3000);
         }
 
         function onPointerDown(e) {
             if (isWin || gameView.classList.contains('hidden')) return;
-            const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
 
             for (let i = pieces.length - 1; i >= 0; i--) {
                 const p = pieces[i];
                 if (!p.isSolved && mouseX > p.x && mouseX < p.x + pieceSize && mouseY > p.y && mouseY < p.y + pieceSize) {
+                    sounds.pickup();
                     selectedPiece = p;
                     pieces.splice(i, 1);
                     pieces.push(selectedPiece);
@@ -378,26 +412,29 @@
 
         function onPointerMove(e) {
             if (!selectedPiece || isWin) return;
-            const rect = canvas.getBoundingClientRect();
-            selectedPiece.x = e.clientX - rect.left - selectedPiece.offsetX;
-            selectedPiece.y = e.clientY - rect.top - selectedPiece.offsetY;
+            selectedPiece.x = e.clientX - selectedPiece.offsetX;
+            selectedPiece.y = e.clientY - selectedPiece.offsetY;
         }
 
         function onPointerUp() {
             if (!selectedPiece) return;
-            const snapDist = Math.max(pieceSize * 0.35, 25); 
+            const snapDist = pieceSize * 0.4;
             const dist = Math.hypot(selectedPiece.x - selectedPiece.correctX, selectedPiece.y - selectedPiece.correctY);
             
             if (dist < snapDist) {
                 selectedPiece.x = selectedPiece.correctX;
                 selectedPiece.y = selectedPiece.correctY;
                 selectedPiece.isSolved = true;
+                sounds.snap();
                 if (pieces.every(p => p.isSolved)) {
                     isWin = true;
                     clearInterval(timerInterval);
                     displayName.innerText = nameInput.value.trim() || "Jagoan";
-                    setTimeout(() => victoryScreen.classList.remove('hidden'), 500);
+                    sounds.victory();
+                    setTimeout(() => victoryScreen.classList.remove('hidden'), 400);
                 }
+            } else {
+                sounds.drop();
             }
             moves++;
             movesDisplay.innerText = moves;
@@ -405,55 +442,66 @@
         }
 
         function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
             if (gameView.classList.contains('hidden')) {
                 requestAnimationFrame(draw);
                 return;
             }
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Area target
+            ctx.fillStyle = "rgba(0,0,0,0.03)";
+            ctx.fillRect(targetX, targetY, targetSize, targetSize);
+            ctx.strokeStyle = "rgba(0,0,0,0.05)";
+            ctx.strokeRect(targetX, targetY, targetSize, targetSize);
+
             if (showFullImage) {
                 ctx.save();
-                ctx.globalAlpha = 0.3;
+                ctx.globalAlpha = 0.2;
                 const minDim = Math.min(img.width, img.height);
-                ctx.drawImage(img, (img.width - minDim)/2, (img.height - minDim)/2, minDim, minDim, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, (img.width - minDim)/2, (img.height - minDim)/2, minDim, minDim, targetX, targetY, targetSize, targetSize);
                 ctx.restore();
-                requestAnimationFrame(draw);
-                return;
             }
 
-            // Panduan halus
-            ctx.strokeStyle = 'rgba(0,0,0,0.05)';
+            ctx.strokeStyle = 'rgba(0,0,0,0.04)';
             ctx.lineWidth = 1;
             pieces.forEach(p => {
                 if(!p.isSolved) {
-                    ctx.save();
                     drawJigsawPath(ctx, p.correctX, p.correctY, pieceSize, p.sides);
                     ctx.stroke();
-                    ctx.restore();
                 }
             });
 
-            // Kepingan
             pieces.forEach(p => {
                 ctx.save();
                 if (selectedPiece === p) {
-                    ctx.shadowBlur = 35;
-                    ctx.shadowColor = "rgba(0,0,0,0.3)";
-                    ctx.shadowOffsetY = 15;
-                    ctx.scale(1.05, 1.05); 
+                    ctx.shadowBlur = 40;
+                    ctx.shadowColor = "rgba(0,0,0,0.25)";
+                    ctx.shadowOffsetY = 10;
+                    ctx.scale(1.08, 1.08);
+                    const scaleDiffX = (p.x * 0.08);
+                    const scaleDiffY = (p.y * 0.08);
+                    ctx.translate(-scaleDiffX/1.08, -scaleDiffY/1.08);
                 }
+                
                 drawJigsawPath(ctx, p.x, p.y, pieceSize, p.sides);
                 ctx.clip();
-                ctx.drawImage(img, p.sx - p.sourceSquareSize * 0.3, p.sy - p.sourceSquareSize * 0.3, p.sourceSquareSize * 1.6, p.sourceSquareSize * 1.6, 
-                              p.x - pieceSize * 0.3, p.y - pieceSize * 0.3, pieceSize * 1.6, pieceSize * 1.6);
+                
+                ctx.drawImage(img, 
+                    p.sx - p.srcStep * 0.3, p.sy - p.srcStep * 0.3, p.srcStep * 1.6, p.srcStep * 1.6, 
+                    p.x - pieceSize * 0.3, p.y - pieceSize * 0.3, pieceSize * 1.6, pieceSize * 1.6
+                );
                 ctx.restore();
                 
-                ctx.save();
-                drawJigsawPath(ctx, p.x, p.y, pieceSize, p.sides);
-                ctx.strokeStyle = p.isSolved ? 'rgba(0,0,0,0.05)' : 'rgba(0,0,0,0.18)';
-                ctx.lineWidth = gridSize > 7 ? 1 : 2;
-                ctx.stroke();
-                ctx.restore();
+                // Border kepingan - HANYA digambar jika kepingan TIDAK sedang dipilih (di-drag)
+                if (selectedPiece !== p) {
+                    ctx.save();
+                    drawJigsawPath(ctx, p.x, p.y, pieceSize, p.sides);
+                    ctx.strokeStyle = p.isSolved ? 'rgba(0,0,0,0.03)' : 'rgba(0,0,0,0.12)';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                    ctx.restore();
+                }
             });
             
             requestAnimationFrame(draw);
