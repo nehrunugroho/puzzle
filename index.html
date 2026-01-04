@@ -65,7 +65,7 @@
         }
         input, button { pointer-events: auto; }
 
-        /* Sembunyikan scrollbar */
+        /* Sembunyikan scrollbar untuk pengalaman layar penuh */
         ::-webkit-scrollbar {
             display: none;
         }
@@ -103,7 +103,7 @@
         <!-- Main Content -->
         <div class="flex-1 flex flex-col justify-evenly py-4 md:py-6 gap-4 overflow-hidden">
             <!-- Data Pemain -->
-            <div id="form-container" class="bg-gradient-to-r from-yellow-100 to-orange-100 p-4 rounded-3xl border-2 border-orange-200 space-y-3 shadow-inner mx-1">
+            <div id="form-container" class="bg-gradient-to-r from-yellow-100 to-orange-100 p-4 rounded-3xl border-2 border-orange-200 space-y-3 shadow-sm mx-1">
                 <input type="text" id="child-name" placeholder="Siapa Nama Kamu? (Wajib)" class="w-full px-5 py-3 rounded-2xl border-2 border-white focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto text-sm transition-all focus:scale-[1.02]">
                 <input type="number" id="child-age" placeholder="Berapa Umur Kamu? (Wajib)" class="w-full px-5 py-3 rounded-2xl border-2 border-white focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto text-sm transition-all focus:scale-[1.02]">
                 <p id="error-msg" class="text-[10px] text-red-500 font-bold text-center hidden">Wah! Nama dan Umur harus diisi dulu ya! 😊</p>
@@ -199,7 +199,7 @@
             <p class="mb-8 text-lg text-gray-800 font-bold leading-tight">Kamu berhasil menyelesaikan tantangan ini! 🌟<br>Kamu memang juara!</p>
             <div class="flex flex-col gap-3 w-full max-w-[280px]">
                 <button onclick="resetGame()" class="bg-gradient-to-r from-emerald-500 to-green-600 text-white py-4 rounded-2xl font-black shadow-xl text-xl hover:scale-105 transition-transform active:scale-95 border-b-4 border-green-800">MAIN LAGI! 🔁</button>
-                <button onclick="backToMenu()" class="bg-gray-100 text-gray-700 py-3 rounded-2xl font-black text-sm hover:bg-gray-200 transition-colors">MENU UTAMA</button>
+                <button onclick="backToMenu()" class="bg-gray-100 text-gray-600 py-3 rounded-2xl font-black text-sm hover:bg-gray-200 transition-colors">MENU UTAMA</button>
             </div>
         </div>
     </div>
@@ -405,6 +405,7 @@
             } else if (shape === 'star') {
                 const center = x + size / 2;
                 const centerY = y + size / 2;
+                context.moveTo(center, centerY - size / 2);
                 for (let i = 0; i < 10; i++) {
                     const angle = (Math.PI * 2 * i) / 10 - Math.PI / 2;
                     const r = i % 2 === 0 ? size / 2 : size / 4;
@@ -419,22 +420,26 @@
             const neck = 0.12;
             context.beginPath();
             context.moveTo(x, y);
+
+            // Top
             if (sides.top !== 0) {
                 const s = sides.top;
                 context.lineTo(x + size * (0.5 - neck), y);
                 context.bezierCurveTo(x + size * (0.5 - neck), y - tabSize * 0.1 * s, x + size * 0.2, y - tabSize * 0.9 * s, x + size * 0.5, y - tabSize * s);
-                context.bezierCurveTo(x + size * (0.5 + neck), y - tabSize * 0.1 * s, x + size * (0.5 + neck), y);
                 context.bezierCurveTo(x + size * 0.8, y - tabSize * 0.9 * s, x + size * (0.5 + neck), y - tabSize * 0.1 * s, x + size * (0.5 + neck), y);
             }
             context.lineTo(x + size, y);
+
+            // Right
             if (sides.right !== 0) {
                 const s = sides.right;
-                context.lineTo(x + size * (0.5 - neck), y);
                 context.lineTo(x + size, y + size * (0.5 - neck));
                 context.bezierCurveTo(x + size + tabSize * 0.1 * s, y + size * (0.5 - neck), x + size + tabSize * 0.9 * s, y + size * 0.2, x + size + tabSize * s, y + size * 0.5);
                 context.bezierCurveTo(x + size + tabSize * 0.9 * s, y + size * 0.8, x + size + tabSize * 0.1 * s, y + size * (0.5 + neck), x + size, y + size * (0.5 + neck));
             }
             context.lineTo(x + size, y + size);
+
+            // Bottom
             if (sides.bottom !== 0) {
                 const s = sides.bottom;
                 context.lineTo(x + size * (0.5 + neck), y + size);
@@ -442,6 +447,8 @@
                 context.bezierCurveTo(x + size * 0.2, y + size + tabSize * 0.9 * s, x + size * (0.5 - neck), y + size + tabSize * 0.1 * s, x + size * (0.5 - neck), y + size);
             }
             context.lineTo(x, y + size);
+
+            // Left
             if (sides.left !== 0) {
                 const s = sides.left;
                 context.lineTo(x, y + size * (0.5 + neck));
@@ -582,17 +589,22 @@
                     ctx.shadowColor = "rgba(0,0,0,0.25)";
                     ctx.shadowOffsetY = 10;
                 }
+                
+                // Lukis Jigsaw Path
                 drawJigsawPath(ctx, p.x, p.y, pieceSize, p.sides);
                 ctx.clip();
+
+                // Masking dengan Bentuk Utama (Segitiga, Bulat, dll)
                 ctx.save();
                 const dx = p.x - p.correctX;
                 const dy = p.y - p.correctY;
                 ctx.translate(dx, dy);
                 defineShapePath(ctx, targetX, targetY, targetSize, currentShape);
-                ctx.restore();
                 ctx.clip();
+                
                 ctx.drawImage(img, p.sx - p.srcStep * 0.3, p.sy - p.srcStep * 0.3, p.srcStep * 1.6, p.srcStep * 1.6, 
                               p.x - pieceSize * 0.3, p.y - pieceSize * 0.3, pieceSize * 1.6, pieceSize * 1.6);
+                ctx.restore();
                 ctx.restore();
             });
             
