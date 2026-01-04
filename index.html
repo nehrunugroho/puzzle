@@ -19,7 +19,7 @@
             width: 100vw;
             height: 100dvh;
         }
-        /* Canvas di lapisan teratas agar kepingan menutupi menu */
+        /* Canvas di lapisan teratas agar kepingan menutupi menu saat bermain */
         #game-canvas {
             position: fixed;
             top: 0;
@@ -78,58 +78,58 @@
             <p class="text-gray-400 font-bold text-[10px] uppercase tracking-widest">Petualangan Seru!</p>
         </div>
 
-        <div class="space-y-4 mb-4 overflow-y-auto pr-1">
+        <div class="space-y-3 mb-4 overflow-y-auto pr-1">
             <!-- Data Pemain -->
-            <div class="bg-yellow-50 p-4 rounded-2xl border-2 border-yellow-100 space-y-3">
-                <input type="text" id="child-name" placeholder="Nama Kamu" class="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto">
-                <input type="number" id="child-age" placeholder="Umur" class="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto">
+            <div class="bg-yellow-50 p-3 rounded-2xl border-2 border-yellow-100 space-y-2">
+                <input type="text" id="child-name" placeholder="Nama Kamu" class="w-full px-4 py-2 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto text-sm">
+                <input type="number" id="child-age" placeholder="Umur" class="w-full px-4 py-2 rounded-xl border-2 border-gray-100 focus:border-orange-400 outline-none font-bold text-gray-700 shadow-sm pointer-events-auto text-sm">
             </div>
 
             <!-- Pilih Bentuk -->
-            <div class="space-y-2">
+            <div class="space-y-1.5">
                 <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Pilih Bentuk Puzzle</p>
                 <div class="grid grid-cols-4 gap-2">
-                    <div onclick="setShape('square')" id="shape-square" class="shape-card active-selection p-2 rounded-xl bg-white flex flex-col items-center shadow-sm">
-                        <span class="text-xl">⬛</span>
+                    <div onclick="setShape('square')" id="shape-square" class="shape-card active-selection p-1.5 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-lg">⬛</span>
                     </div>
-                    <div onclick="setShape('circle')" id="shape-circle" class="shape-card p-2 rounded-xl bg-white flex flex-col items-center shadow-sm">
-                        <span class="text-xl">🔴</span>
+                    <div onclick="setShape('circle')" id="shape-circle" class="shape-card p-1.5 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-lg">🔴</span>
                     </div>
-                    <div onclick="setShape('triangle')" id="shape-triangle" class="shape-card p-2 rounded-xl bg-white flex flex-col items-center shadow-sm">
-                        <span class="text-xl">🔺</span>
+                    <div onclick="setShape('triangle')" id="shape-triangle" class="shape-card p-1.5 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-lg">🔺</span>
                     </div>
-                    <div onclick="setShape('star')" id="shape-star" class="shape-card p-2 rounded-xl bg-white flex flex-col items-center shadow-sm">
-                        <span class="text-xl">⭐</span>
+                    <div onclick="setShape('star')" id="shape-star" class="shape-card p-1.5 rounded-xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-lg">⭐</span>
                     </div>
                 </div>
             </div>
 
             <!-- Pilih Level -->
-            <div class="space-y-2">
+            <div class="space-y-1.5">
                 <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Pilih Level</p>
                 <div class="grid grid-cols-2 gap-2">
-                    <div onclick="startGame(2)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
-                        <span class="text-2xl">🌱</span>
-                        <span class="font-black text-gray-700 text-xs">2x2</span>
+                    <div onclick="startGame(2)" class="level-card p-2 rounded-2xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-xl">🌱</span>
+                        <span class="font-black text-gray-700 text-[10px]">2x2</span>
                     </div>
-                    <div onclick="startGame(3)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
-                        <span class="text-2xl">🐣</span>
-                        <span class="font-black text-gray-700 text-xs">3x3</span>
+                    <div onclick="startGame(3)" class="level-card p-2 rounded-2xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-xl">🐣</span>
+                        <span class="font-black text-gray-700 text-[10px]">3x3</span>
                     </div>
-                    <div onclick="startGame(4)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
-                        <span class="text-2xl">🦁</span>
-                        <span class="font-black text-gray-700 text-xs">4x4</span>
+                    <div onclick="startGame(4)" class="level-card p-2 rounded-2xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-xl">🦁</span>
+                        <span class="font-black text-gray-700 text-[10px]">4x4</span>
                     </div>
-                    <div onclick="startGame(5)" class="level-card p-3 rounded-2xl bg-white flex flex-col items-center shadow-sm">
-                        <span class="text-2xl">🚀</span>
-                        <span class="font-black text-gray-700 text-xs">5x5</span>
+                    <div onclick="startGame(5)" class="level-card p-2 rounded-2xl bg-white flex flex-col items-center shadow-sm">
+                        <span class="text-xl">🚀</span>
+                        <span class="font-black text-gray-700 text-[10px]">5x5</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="flex flex-col gap-2">
-            <label class="cursor-pointer bg-white text-blue-500 text-center py-3 rounded-2xl text-xs font-black border-2 border-blue-100 shadow-sm block pointer-events-auto">
+            <label class="cursor-pointer bg-white text-blue-500 text-center py-2.5 rounded-2xl text-xs font-black border-2 border-blue-100 shadow-sm block pointer-events-auto">
                 📸 Pilih Foto Sendiri
                 <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
             </label>
@@ -287,6 +287,7 @@
             gridSize = level;
             homeView.classList.add('hidden');
             gameView.classList.remove('hidden');
+            canvas.classList.remove('hidden'); // Pastikan canvas muncul saat mulai
             setupDimensions();
             resetGame();
         }
@@ -296,6 +297,7 @@
             clearInterval(timerInterval);
             gameView.classList.add('hidden');
             homeView.classList.remove('hidden');
+            canvas.classList.remove('hidden'); // Munculkan kembali canvas jika sebelumnya menang
             isWin = false;
             victoryScreen.classList.add('hidden');
         }
@@ -418,6 +420,7 @@
             moves = 0;
             movesDisplay.innerText = moves;
             victoryScreen.classList.add('hidden');
+            canvas.classList.remove('hidden'); // Munculkan kembali canvas jika acak ulang setelah menang
             pieces.forEach(p => {
                 p.x = Math.random() * (canvas.width - pieceSize);
                 p.y = Math.random() * (canvas.height - pieceSize);
@@ -435,7 +438,12 @@
             }, 1000);
         }
 
-        function resetGame() { createPieces(); shufflePieces(); }
+        function resetGame() { 
+            canvas.classList.remove('hidden');
+            createPieces(); 
+            shufflePieces(); 
+        }
+
         function showPreview() { sounds.click(); showFullImage = true; setTimeout(() => { showFullImage = false; }, 3000); }
 
         function onPointerDown(e) {
@@ -444,9 +452,7 @@
             const mouseX = e.clientX;
             const mouseY = e.clientY;
 
-            // Cari kepingan puzzle
             let foundIndex = -1;
-            // Hanya deteksi kepingan jika game view aktif (atau jika kepingan ada di luar menu di home view)
             for (let i = pieces.length - 1; i >= 0; i--) {
                 const p = pieces[i];
                 if (!p.isSolved && mouseX > p.x && mouseX < p.x + pieceSize && mouseY > p.y && mouseY < p.y + pieceSize) {
@@ -462,10 +468,10 @@
                 pieces.push(selectedPiece); 
                 selectedPiece.offsetX = mouseX - selectedPiece.x;
                 selectedPiece.offsetY = mouseY - selectedPiece.y;
-                return true; // Berhasil pegang kepingan
+                return true; 
             }
             
-            return false; // Tidak pegang apa pun, biarkan event tembus ke UI
+            return false; 
         }
 
         function onPointerMove(e) {
@@ -488,7 +494,11 @@
                     clearInterval(timerInterval);
                     displayName.innerText = nameInput.value.trim() || "Jagoan";
                     sounds.victory();
-                    setTimeout(() => victoryScreen.classList.remove('hidden'), 400);
+                    // FIX: Sembunyikan canvas tepat saat layar kemenangan muncul
+                    setTimeout(() => {
+                        victoryScreen.classList.remove('hidden');
+                        canvas.classList.add('hidden'); 
+                    }, 400);
                 }
             } else { sounds.drop(); }
             moves++;
@@ -499,7 +509,6 @@
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Render elemen puzzle hanya jika tidak di home view (opsional, tapi di sini kita tampilkan kepingan yang berceceran jika ada)
             if (!gameView.classList.contains('hidden')) {
                 // Area target
                 ctx.save();
@@ -536,7 +545,6 @@
                 ctx.restore();
             }
 
-            // Gambar kepingan di semua kondisi (selama ada kepingan)
             pieces.forEach(p => {
                 ctx.save();
                 if (selectedPiece === p) {
